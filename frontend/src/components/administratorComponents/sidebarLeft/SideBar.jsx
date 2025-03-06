@@ -5,14 +5,16 @@ import { FiSettings } from "react-icons/fi";
 
 export function SideBar(){
     return(
-        <div>
-            <div>
-                <div>
-                    <FiHome size={50} color="#E6523A" />
-                    <FiUser size={50} color="#E6523A" />
-                    <FiPackage size={50} color="#E6523A" />
-                    <FiSettings size={50} color="#E6523A" />
+        <div className="flex">
+            <div className="bg-gray-200 w-20 h-screen flex flex-col justify-between relative">
+                <div className="space-y-4">
+                    <FiHome size={50} className=" text-red-500 mx-auto mt-4"/>
+                    <FiUser size={50} className=" text-red-500 mx-auto"/>
+                    <FiPackage size={50} className=" text-red-500 mx-auto"/>
                 </div>
+                <FiSettings size={50} className=" text-red-500 mx-auto mb-4"/>
+            </div>
+            <div>
             </div>
         </div>
     )
