@@ -15,7 +15,7 @@ export function SideBar(){
                 </div>
                 <FiSettings size={50} className=" text-red-500 mx-auto mb-4"/>
             </div>
-            <div>
+            <div className="w-full">
                 <Dashboard/>
             </div>
         </div>
