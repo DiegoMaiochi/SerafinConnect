@@ -2,6 +2,7 @@ import { FiUser } from "react-icons/fi";
 import { FiHome } from "react-icons/fi";
 import { FiPackage } from "react-icons/fi";
 import { FiSettings } from "react-icons/fi";
+import { Dashboard } from "./Dashboard";
 
 export function SideBar(){
     return(
@@ -15,6 +16,7 @@ export function SideBar(){
                 <FiSettings size={50} className=" text-red-500 mx-auto mb-4"/>
             </div>
             <div>
+                <Dashboard/>
             </div>
         </div>
     )
