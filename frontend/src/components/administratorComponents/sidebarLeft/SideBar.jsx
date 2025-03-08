@@ -4,6 +4,7 @@ import { FiPackage } from "react-icons/fi";
 import { FiSettings } from "react-icons/fi";
 import { Dashboard } from "./Dashboard";
 import { Usuarios } from "./Usuario";
+import { Produtos } from "./Produtos";
 
 export function SideBar(){
     return(
@@ -19,7 +20,8 @@ export function SideBar(){
             <div className="w-full">
                 {/* para visualizar a página do Dashboard basta substituir o arquivo para o arquivo Dashboard */}
                 {/* para visualizar a página do Usuários basta substituir o arquivo para o arquivo Usuários */}
-                <Usuarios/>
+                {/* para visualizar a página do Produtos basta substituir o arquivo para o arquivo Produtos */}
+                <Produtos/>
             </div>
         </div>
     )
