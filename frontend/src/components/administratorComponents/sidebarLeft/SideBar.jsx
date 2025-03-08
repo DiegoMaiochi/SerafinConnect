@@ -3,6 +3,7 @@ import { FiHome } from "react-icons/fi";
 import { FiPackage } from "react-icons/fi";
 import { FiSettings } from "react-icons/fi";
 import { Dashboard } from "./Dashboard";
+import { Usuarios } from "./Usuario";
 
 export function SideBar(){
     return(
@@ -16,7 +17,8 @@ export function SideBar(){
                 <FiSettings size={50} className=" text-red-500 mx-auto mb-4"/>
             </div>
             <div className="w-full">
-                <Dashboard/>
+                {/* para visualizar a página do dashboard basta substituir o arquivo Usuarios para o arquivo Dashboard */}
+                <Usuarios/>
             </div>
         </div>
     )
