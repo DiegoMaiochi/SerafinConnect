@@ -3,9 +3,10 @@ import { FiHome } from "react-icons/fi";
 import { FiPackage } from "react-icons/fi";
 import { FiSettings } from "react-icons/fi";
 import { Dashboard } from "./Dashboard";
-import { Usuarios } from "./Usuario";
+import { Usuarios } from "./Usuarios";
 import { Produtos } from "./Produtos";
 import { Cupons } from "./Cupons";
+import { Mesas } from "./Mesas";
 
 export function SideBar(){
     return(
@@ -25,7 +26,8 @@ export function SideBar(){
                 {/* para visualizar a página do Usuários basta substituir o arquivo para o arquivo Usuários */}
                 {/* para visualizar a página do Produtos basta substituir o arquivo para o arquivo Produtos */}
                 {/* para visualizar a página do Cupons basta substituir o arquivo para o arquivo Cupons */}
-                <Produtos/>
+                {/* para visualizar a página do Mesas basta substituir o arquivo para o arquivo Mesas */}
+                <Mesas/>
             </div>
         </div>
     )
