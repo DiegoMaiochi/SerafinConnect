@@ -5,7 +5,7 @@ export function Usuarios(){
         <div className="m-7">
             <div>
                 <h1 className="text-red-500 font-black text-5xl mt-4">USUÁRIOS</h1>
-                <h3 className="font-bold">Crie e gerencie dados de clientes e funcionários.</h3>
+                <h3 className="font-bold">Crie e gerencie os dados de clientes e funcionários.</h3>
                 <hr className="border-y-2 w-full mt-2 border-gray-200"/>
             </div>
             <div className="flex mt-4 ml-10">
