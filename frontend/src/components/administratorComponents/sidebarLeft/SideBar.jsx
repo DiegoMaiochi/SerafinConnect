@@ -8,7 +8,7 @@ import { Usuarios } from "./Usuario";
 export function SideBar(){
     return(
         <div className="flex">
-            <div className="bg-gray-200 w-20 h-screen flex flex-col justify-between relative">
+            <div className="bg-gray-200 w-24 h-screen flex flex-col justify-between relative">
                 <div className="space-y-4">
                     <FiHome size={50} className=" text-red-500 mx-auto mt-4"/>
                     <FiUser size={50} className=" text-red-500 mx-auto"/>
@@ -17,7 +17,8 @@ export function SideBar(){
                 <FiSettings size={50} className=" text-red-500 mx-auto mb-4"/>
             </div>
             <div className="w-full">
-                {/* para visualizar a página do dashboard basta substituir o arquivo Usuarios para o arquivo Dashboard */}
+                {/* para visualizar a página do Dashboard basta substituir o arquivo para o arquivo Dashboard */}
+                {/* para visualizar a página do Usuários basta substituir o arquivo para o arquivo Usuários */}
                 <Usuarios/>
             </div>
         </div>
