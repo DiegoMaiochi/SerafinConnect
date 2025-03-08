@@ -10,7 +10,7 @@ export function Dashboard(){
             </div>
             <div className="flex mt-4 ml-10">
                 <div className="bg-gray-200 w-4/5 p-1 rounded-2xl">
-                    <FiSearch size={25} className="text-red-500"/>
+                    <FiSearch size={25} className="text-red-500 ml-2"/>
                 </div>
                 <div>
                     <FiFilter size={25} className="text-red-500 mt-1 ml-2"/>

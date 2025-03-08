@@ -7,6 +7,7 @@ import './global.css'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
+    {/* para voltar ao projeto antigo basta substituir o SideBar pelo arquivo App */}
     <SideBar/>
   </StrictMode>,
 )
