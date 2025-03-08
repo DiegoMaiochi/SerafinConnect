@@ -17,10 +17,7 @@ export function Produtos(){
                         <FiFilter size={25} className="text-red-500 mt-1 ml-2"/>
                     </div>
                     <div>
-                        <FiList size={25} className="text-red-500 mt-1 ml-2"/>
-                    </div>
-                    <div>
-                        <h1 className="bg-green-400 p-1 pl-4 pr-4 rounded-2xl font-bold ml-4">+ADICIONAR</h1>
+                        <h1 className="bg-green-400 p-1 pl-4 pr-4 rounded-2xl font-bold ml-2">+ADICIONAR</h1>
                     </div>
                 </div>
 
