@@ -1,34 +1,51 @@
-import { FiCheckSquare, FiGrid, FiMonitor, FiPercent, FiSquare, FiTable, FiTag, FiUser } from "react-icons/fi";
-import { FiHome } from "react-icons/fi";
-import { FiPackage } from "react-icons/fi";
-import { FiSettings } from "react-icons/fi";
+import { useState } from "react";
+import { FiCheckSquare, FiHome, FiPackage, FiSettings, FiTag, FiUser } from "react-icons/fi";
 import { Dashboard } from "./Dashboard";
 import { Usuarios } from "./Usuarios";
 import { Produtos } from "./Produtos";
 import { Cupons } from "./Cupons";
 import { Mesas } from "./Mesas";
 
-export function SideBar(){
-    return(
+export function SideBar() {
+    const [activeComponent, setActiveComponent] = useState("Dashboard");
+
+    const renderComponent = () => {
+        switch (activeComponent) {
+            case "Dashboard":
+                return <Dashboard />;
+            case "Usuarios":
+                return <Usuarios />;
+            case "Produtos":
+                return <Produtos />;
+            case "Cupons":
+                return <Cupons />;
+            case "Mesas":
+                return <Mesas />;
+            default:
+                return <Dashboard />;
+        }
+    };
+
+    const getIconClass = (component) =>
+        activeComponent === component
+            ? "bg-red-500 text-white p-2 rounded-md transition-colors duration-300 ease-in-out"
+            : "text-red-500 hover:bg-gray-300 p-2 rounded-md transition-colors duration-300 ease-in-out";
+
+    return (
         <div className="flex">
             <div className="bg-gray-200 w-24 h-screen flex flex-col justify-between relative">
                 <div className="space-y-5">
-                    <FiHome size={50} className=" text-red-500 mx-auto mt-4"/>
-                    <FiUser size={50} className=" text-red-500 mx-auto"/>
-                    <FiPackage size={50} className=" text-red-500 mx-auto"/>
-                    <FiTag size={50} className=" text-red-500 mx-auto"/>
-                    <FiCheckSquare size={50} className=" text-red-500 mx-auto"/>
+                    <FiHome size={60} className={`mx-auto mt-4 cursor-pointer ${getIconClass("Dashboard")}`} onClick={() => setActiveComponent("Dashboard")} />
+                    <FiUser size={60} className={`mx-auto cursor-pointer ${getIconClass("Usuarios")}`} onClick={() => setActiveComponent("Usuarios")} />
+                    <FiPackage size={60} className={`mx-auto cursor-pointer ${getIconClass("Produtos")}`} onClick={() => setActiveComponent("Produtos")} />
+                    <FiTag size={60} className={`mx-auto cursor-pointer ${getIconClass("Cupons")}`} onClick={() => setActiveComponent("Cupons")} />
+                    <FiCheckSquare size={60} className={`mx-auto cursor-pointer ${getIconClass("Mesas")}`} onClick={() => setActiveComponent("Mesas")} />
                 </div>
-                <FiSettings size={50} className=" text-red-500 mx-auto mb-4"/>
+                <FiSettings size={60} className="text-red-500 mx-auto mb-4" />
             </div>
-            <div className="w-full">
-                {/* para visualizar a página do Dashboard basta substituir o arquivo para o arquivo Dashboard */}
-                {/* para visualizar a página do Usuários basta substituir o arquivo para o arquivo Usuários */}
-                {/* para visualizar a página do Produtos basta substituir o arquivo para o arquivo Produtos */}
-                {/* para visualizar a página do Cupons basta substituir o arquivo para o arquivo Cupons */}
-                {/* para visualizar a página do Mesas basta substituir o arquivo para o arquivo Mesas */}
-                <Mesas/>
+            <div className="teste w-full">
+                {renderComponent()}
             </div>
         </div>
-    )
+    );
 }
