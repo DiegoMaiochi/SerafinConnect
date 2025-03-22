@@ -26,17 +26,22 @@ export function SideBar() {
         }
     };
 
+    const getIconClass = (component) =>
+        activeComponent === component
+            ? "bg-red-500 text-white p-2 rounded-md transition-colors duration-300 ease-in-out"
+            : "text-red-500 hover:bg-gray-300 p-2 rounded-md transition-colors duration-300 ease-in-out";
+
     return (
         <div className="flex">
             <div className="bg-gray-200 w-24 h-screen flex flex-col justify-between relative">
                 <div className="space-y-5">
-                    <FiHome size={50} className="text-red-500 mx-auto mt-4 cursor-pointer" onClick={() => setActiveComponent("Dashboard")} />
-                    <FiUser size={50} className="text-red-500 mx-auto cursor-pointer" onClick={() => setActiveComponent("Usuarios")} />
-                    <FiPackage size={50} className="text-red-500 mx-auto cursor-pointer" onClick={() => setActiveComponent("Produtos")} />
-                    <FiTag size={50} className="text-red-500 mx-auto cursor-pointer" onClick={() => setActiveComponent("Cupons")} />
-                    <FiCheckSquare size={50} className="text-red-500 mx-auto cursor-pointer" onClick={() => setActiveComponent("Mesas")} />
+                    <FiHome size={60} className={`mx-auto mt-4 cursor-pointer ${getIconClass("Dashboard")}`} onClick={() => setActiveComponent("Dashboard")} />
+                    <FiUser size={60} className={`mx-auto cursor-pointer ${getIconClass("Usuarios")}`} onClick={() => setActiveComponent("Usuarios")} />
+                    <FiPackage size={60} className={`mx-auto cursor-pointer ${getIconClass("Produtos")}`} onClick={() => setActiveComponent("Produtos")} />
+                    <FiTag size={60} className={`mx-auto cursor-pointer ${getIconClass("Cupons")}`} onClick={() => setActiveComponent("Cupons")} />
+                    <FiCheckSquare size={60} className={`mx-auto cursor-pointer ${getIconClass("Mesas")}`} onClick={() => setActiveComponent("Mesas")} />
                 </div>
-                <FiSettings size={50} className="text-red-500 mx-auto mb-4" />
+                <FiSettings size={60} className="text-red-500 mx-auto mb-4" />
             </div>
             <div className="teste w-full">
                 {renderComponent()}
