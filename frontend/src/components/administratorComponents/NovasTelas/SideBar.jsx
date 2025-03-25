@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FiCheckSquare, FiHome, FiPackage, FiSettings, FiTag, FiUser } from "react-icons/fi";
+import { FiGrid, FiHome, FiPackage, FiSettings, FiTag, FiUser } from "react-icons/fi";
 import { Dashboard } from "./Dashboard";
 import { Usuarios } from "./Usuarios";
 import { Produtos } from "./Produtos";
@@ -39,11 +39,11 @@ export function SideBar() {
                     <FiUser size={60} className={`mx-auto cursor-pointer ${getIconClass("Usuarios")}`} onClick={() => setActiveComponent("Usuarios")} />
                     <FiPackage size={60} className={`mx-auto cursor-pointer ${getIconClass("Produtos")}`} onClick={() => setActiveComponent("Produtos")} />
                     <FiTag size={60} className={`mx-auto cursor-pointer ${getIconClass("Cupons")}`} onClick={() => setActiveComponent("Cupons")} />
-                    <FiCheckSquare size={60} className={`mx-auto cursor-pointer ${getIconClass("Mesas")}`} onClick={() => setActiveComponent("Mesas")} />
+                    <FiGrid size={60} className={`mx-auto cursor-pointer ${getIconClass("Mesas")}`} onClick={() => setActiveComponent("Mesas")} />
                 </div>
                 <FiSettings size={60} className="text-red-500 mx-auto mb-4" />
             </div>
-            <div className="teste w-full">
+            <div className="w-full">
                 {renderComponent()}
             </div>
         </div>
