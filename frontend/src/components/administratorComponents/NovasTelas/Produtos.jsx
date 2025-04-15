@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FiFilter, FiList, FiSearch, FiXCircle } from "react-icons/fi";
 
 export function Produtos() {
@@ -14,11 +14,33 @@ export function Produtos() {
     const [price, setPrice] = useState("");
     const [description, setDescription] = useState("");
 
+    const [productList, setProductList] = useState([]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const productsPerPage = 18;
+
     const toggleForm = () => setShowForm(!showForm);
 
     const groups = [
         "Drinks", "Cervejas", "Vinhos", "Não Alcoólicos", "Porçoes", "Doses", "Garrafas", "Combos"
     ];
+
+    const fetchProducts = async () => {
+        try {
+            const response = await fetch("http://localhost:3000/api/produtos");
+            if (response.ok) {
+                const data = await response.json();
+                setProductList(data);
+            } else {
+                console.error("Erro ao buscar produtos.");
+            }
+        } catch (error) {
+            console.error("Erro na requisição:", error);
+        }
+    };
+
+    useEffect(() => {
+        fetchProducts();
+    }, []);
 
     const handleSubmit = async () => {
         if (!ean || !name || !price || !quantity) {
@@ -74,6 +96,7 @@ export function Produtos() {
 
             clearForm();
             toggleForm();
+            fetchProducts();
         } catch (error) {
             console.error("Erro:", error);
             alert("Erro ao processar a requisição.");
@@ -89,11 +112,18 @@ export function Produtos() {
         setSelectedGroup("");
         setSelectedType("");
     };
+    
+    const totalPages = Math.ceil(productList.length / productsPerPage);
+    const indexOfLastProduct = currentPage * productsPerPage;
+    const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+    const currentProducts = productList.slice(indexOfFirstProduct, indexOfLastProduct);
+
+    const handlePageChange = (pageNumber) => setCurrentPage(pageNumber);
 
     return (
         <div>
             <div className="m-7">
-                <h1 className="text-red-500 font-black text-5xl mt-4">PRODUTOS</h1>
+                <h1 className="text-red-500 font-black text-5xl ">PRODUTOS</h1>
                 <h3 className="font-bold">Crie e gerencie os dados de seus produtos.</h3>
                 <hr className="border-y-2 w-full mt-2 border-gray-200" />
 
@@ -114,7 +144,36 @@ export function Produtos() {
                     </div>
                 </div>
 
-                <div className="bg-gray-200 h-auto mt-4 p-8 rounded-2xl"></div>
+                <div className="bg-gray-200 h-full mt-4 p-4 rounded-2xl">
+                    {currentProducts.length > 0 ? (
+                        <>
+                            <ul className="grid grid-cols-6 gap-4">
+                                {currentProducts.map((product) => (
+                                    <li key={product.id} className="bg-gray-400 p-4 rounded-xl shadow-md">
+                                        <p><strong>Nome:</strong> {product.name}</p>
+                                        <p><strong>EAN:</strong> {product.ean}</p>
+                                        <p><strong>Preço:</strong> R$ {product.price}</p>
+                                        <p><strong>Quantidade:</strong> {product.quantity}</p>
+                                    </li>
+                                ))}
+                            </ul>
+
+                            <div className="flex justify-center mt-6 space-x-2">
+                                {[...Array(totalPages)].map((_, index) => (
+                                    <button
+                                        key={index}
+                                        onClick={() => handlePageChange(index + 1)}
+                                        className={`px-4 py-2 rounded-lg font-semibold ${currentPage === index + 1 ? 'bg-red-500 text-white' : 'bg-white text-red-500 border border-red-500'}`}
+                                    >
+                                        {index + 1}
+                                    </button>
+                                ))}
+                            </div>
+                        </>
+                    ) : (
+                        <p>Nenhum produto cadastrado.</p>
+                    )}
+                </div>
             </div>
 
             {showForm && (
