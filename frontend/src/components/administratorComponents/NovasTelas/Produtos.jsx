@@ -8,22 +8,94 @@ export function Produtos() {
     const [showTypeOptions, setShowTypeOptions] = useState(false);
     const [selectedType, setSelectedType] = useState("");
 
-    const toggleForm = () => {
-        setShowForm(!showForm);
-    };
+    const [ean, setEan] = useState("");
+    const [name, setName] = useState("");
+    const [quantity, setQuantity] = useState("");
+    const [price, setPrice] = useState("");
+    const [description, setDescription] = useState("");
+
+    const toggleForm = () => setShowForm(!showForm);
 
     const groups = [
         "Drinks", "Cervejas", "Vinhos", "Não Alcoólicos", "Porçoes", "Doses", "Garrafas", "Combos"
     ];
 
+    const handleSubmit = async () => {
+        if (!ean || !name || !price || !quantity) {
+            alert("Preencha todos os campos obrigatórios.");
+            return;
+        }
+
+        if (isNaN(ean) || ean.trim() === "") {
+            alert("Código EAN inválido.");
+            return;
+        }
+
+        try {
+            const response = await fetch(`http://localhost:3000/api/produto/ean/${ean.trim()}`);
+
+            if (response.ok) {
+                const data = await response.json();
+                const updatedProduct = {
+                    ...data,
+                    quantity: data.quantity + parseInt(quantity),
+                };
+
+                await fetch(`http://localhost:3000/api/produto/ean/${ean.trim()}`, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(updatedProduct),
+                });
+                alert("Produto já cadastrado. Quantidade atualizada!");
+            } else if (response.status === 404) {
+                const newProduct = {
+                    ean: ean.trim(),
+                    name,
+                    description,
+                    price: parseFloat(price),
+                    quantity: parseInt(quantity),
+                    group: selectedGroup,
+                    type: selectedType,
+                };
+
+                await fetch("http://localhost:3000/api/produto", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(newProduct),
+                });
+                alert("Produto cadastrado com sucesso!");
+            } else {
+                alert("Erro ao acessar o produto.");
+            }
+
+            clearForm();
+            toggleForm();
+        } catch (error) {
+            console.error("Erro:", error);
+            alert("Erro ao processar a requisição.");
+        }
+    };
+
+    const clearForm = () => {
+        setEan("");
+        setName("");
+        setQuantity("");
+        setPrice("");
+        setDescription("");
+        setSelectedGroup("");
+        setSelectedType("");
+    };
+
     return (
         <div>
             <div className="m-7">
-                <div>
-                    <h1 className="text-red-500 font-black text-5xl mt-4">PRODUTOS</h1>
-                    <h3 className="font-bold">Crie e gerencie os dados de seus produtos.</h3>
-                    <hr className="border-y-2 w-full mt-2 border-gray-200" />
-                </div>
+                <h1 className="text-red-500 font-black text-5xl mt-4">PRODUTOS</h1>
+                <h3 className="font-bold">Crie e gerencie os dados de seus produtos.</h3>
+                <hr className="border-y-2 w-full mt-2 border-gray-200" />
 
                 <div className="flex mt-4 ml-10">
                     <div className="bg-gray-200 w-4/5 p-1 rounded-2xl">
@@ -47,24 +119,22 @@ export function Produtos() {
 
             {showForm && (
                 <div className="fixed bottom-0 right-0 h-full w-1/3 bg-gray-300 shadow-2xl p-6 rounded-tl-2xl rounded-bl-2xl border-t flex flex-col">
-                    <div className="cursor-pointer ">
-                        <button
-                            className="text-2xl  text-black ml-2 hover:bg-gray-300 hover:text-gray-500"
-                            onClick={toggleForm}
-                        >
-                            <FiXCircle size={30} />
-                        </button>
-                    </div>
+                    <button
+                        className="text-2xl text-black ml-2 self-end hover:bg-gray-300 hover:text-gray-500"
+                        onClick={toggleForm}
+                    >
+                        <FiXCircle size={30} />
+                    </button>
                     <h2 className="text-2xl font-bold flex justify-center m-2">Adicionar Produto</h2>
 
-                    <div className="mt-24 space-y-2">
-                        <input type="number" placeholder="EAN" className="w-full p-2 border rounded-lg" />
-                        <input type="text" placeholder="Nome do Produto" className="w-full p-2 border rounded-lg" />
+                    <div className="mt-12 space-y-2">
+                        <input type="number" placeholder="EAN" value={ean} onChange={e => setEan(e.target.value)} className="w-full p-2 border rounded-lg" />
+                        <input type="text" placeholder="Nome do Produto" value={name} onChange={e => setName(e.target.value)} className="w-full p-2 border rounded-lg" />
                         <div className="flex justify-between space-x-2">
-                            <input type="number" placeholder="Qtd.:" className="w-full p-2 border rounded-lg" />
-                            <input type="number" placeholder="Preço:" className="w-full p-2 border rounded-lg" />
+                            <input type="number" placeholder="Qtd.:" value={quantity} onChange={e => setQuantity(e.target.value)} className="w-full p-2 border rounded-lg" />
+                            <input type="number" placeholder="Preço:" value={price} onChange={e => setPrice(e.target.value)} className="w-full p-2 border rounded-lg" />
                         </div>
-                        <input type="text" placeholder="Descrição:" className="w-full p-2 border rounded-lg" />
+                        <input type="text" placeholder="Descrição:" value={description} onChange={e => setDescription(e.target.value)} className="w-full p-2 border rounded-lg" />
 
                         <div className="flex justify-between space-x-2">
                             <div className="relative w-full">
@@ -118,7 +188,10 @@ export function Produtos() {
                         </div>
                     </div>
 
-                    <button className="bg-green-500 hover:bg-green-400 text-white font-bold px-4 py-2 rounded-lg absolute bottom-6 left-1/2 transform -translate-x-1/2 w-24 mb-10">
+                    <button
+                        onClick={handleSubmit}
+                        className="bg-green-500 hover:bg-green-400 text-white font-bold px-4 py-2 rounded-lg absolute bottom-6 left-1/2 transform -translate-x-1/2 w-24 mb-10"
+                    >
                         Salvar
                     </button>
                 </div>
