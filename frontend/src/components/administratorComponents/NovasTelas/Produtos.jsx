@@ -3,10 +3,16 @@ import { FiFilter, FiList, FiSearch, FiXCircle } from "react-icons/fi";
 
 export function Produtos() {
     const [showForm, setShowForm] = useState(false);
+    const [showGroupOptions, setShowGroupOptions] = useState(false);
+    const [selectedGroup, setSelectedGroup] = useState("");
 
     const toggleForm = () => {
         setShowForm(!showForm);
     };
+
+    const groups = [
+        "Drinks", "Cervejas", "Vinhos", "Não Alcoólicos", "Porçoes", "Doses", "Garrafas", "Combos"
+    ];
 
     return (
         <div>
@@ -37,49 +43,38 @@ export function Produtos() {
                     <div className="cursor-pointer ">
                         <button className="text-2xl  text-black ml-2 hover:bg-gray-300 hover:text-gray-500" onClick={toggleForm}><FiXCircle size={30}/></button>
                     </div>
-                    <h2 className="text-2xl font-bold flex justify-center m-2 text-gray-">Adicionar Produto</h2>
+                    <h2 className="text-2xl font-bold flex justify-center m-2">Adicionar Produto</h2>
                     
                     {/* Campos do formulário */}
                     <div className="mt-24 space-y-2">
-                        <input
-                            type="number" 
-                            placeholder="EAN" 
-                            className="w-full p-2 border rounded-lg"
-                        />
-                        <input 
-                            type="text" 
-                            placeholder="Nome do Produto" 
-                            className="w-full p-2 border rounded-lg"
-                        />
+                        <input type="number" placeholder="EAN" className="w-full p-2 border rounded-lg"/>
+                        <input type="text" placeholder="Nome do Produto" className="w-full p-2 border rounded-lg"/>
                         <div className="flex justify-between space-x-2">
-                            <input 
-                                type="number" 
-                                placeholder="Qtd.:" 
-                                className="w-full p-2 border rounded-lg"
-                            />
-                            <input 
-                                type="number" 
-                                placeholder="Preço:" 
-                                className="w-full p-2 border rounded-lg"
-                            />
+                            <input type="number" placeholder="Qtd.:" className="w-full p-2 border rounded-lg"/>
+                            <input type="number" placeholder="Preço:" className="w-full p-2 border rounded-lg"/>
                         </div>
+                        <input type="text" placeholder="Descrição:" className="w-full p-2 border rounded-lg"/>
                         
-                        <input 
-                            type="text" 
-                            placeholder="Descrição:" 
-                            className="w-full p-2 border rounded-lg"
-                        />
                         <div className="flex justify-between space-x-2">
-                            <input 
-                                type="text" 
-                                placeholder="Grupo:" 
-                                className="w-full p-2 border rounded-lg"
-                            />
-                            <input 
-                                type="text" 
-                                placeholder="Tipo:" 
-                                className="w-full p-2 border rounded-lg"
-                            />
+                            <div className="relative w-full">
+                                <button onClick={() => setShowGroupOptions(!showGroupOptions)} className="w-full p-2 border rounded-lg bg-white text-left">
+                                    {selectedGroup || "Selecione um grupo"}
+                                </button>
+                                {showGroupOptions && (
+                                    <ul className="absolute w-full bg-white border rounded-lg mt-1 shadow-lg z-10">
+                                        {groups.map((group, index) => (
+                                            <li 
+                                                key={index} 
+                                                onClick={() => { setSelectedGroup(group); setShowGroupOptions(false); }} 
+                                                className="p-1 cursor-pointer hover:bg-gray-200"
+                                            >
+                                                {group}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
+                            </div>
+                            <input type="text" placeholder="Tipo:" className="w-full p-2 border rounded-lg"/>
                         </div>
                     </div>
                     
