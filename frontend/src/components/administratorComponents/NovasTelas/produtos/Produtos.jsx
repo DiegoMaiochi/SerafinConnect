@@ -136,12 +136,11 @@ export function Produtos() {
                     </div>
                 </div>
 
-                {/* Aqui renderiza a lista de produtos em outro arquivo */}
                 <ProductList products={productList} />
             </div>
 
             {showForm && (
-                <div className="fixed bottom-0 right-0 h-full w-1/3 bg-gray-300 shadow-2xl p-6 rounded-tl-2xl rounded-bl-2xl border-t flex flex-col">
+                <div className="fixed bottom-0 right-0 h-full w-1/4 bg-gray-300 shadow-2xl p-6 rounded-tl-2xl rounded-bl-2xl border-t flex flex-col">
                     <button
                         className="text-2xl text-black ml-2 self-end hover:bg-gray-300 hover:text-gray-500"
                         onClick={toggleForm}
