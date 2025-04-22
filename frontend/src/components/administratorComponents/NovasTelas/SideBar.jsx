@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { FiGrid, FiHome, FiPackage, FiSettings, FiTag, FiUser } from "react-icons/fi";
-import { Dashboard } from "./Dashboard";
-import { Usuarios } from "./Usuarios";
+import { Dashboard } from "./dashboard/Dashboard";
+import { Usuarios } from "./usuarios/Usuarios";
 import { Produtos } from "./produtos/Produtos";
-import { Cupons } from "./Cupons";
-import { Mesas } from "./Mesas";
+import { Cupons } from "./cupons/Cupons";
+import { Mesas } from "./mesas/Mesas";
 
 export function SideBar() {
     const [activeComponent, setActiveComponent] = useState("Dashboard");
