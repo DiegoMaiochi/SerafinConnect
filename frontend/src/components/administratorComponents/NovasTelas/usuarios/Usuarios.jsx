@@ -158,7 +158,6 @@ export function Usuarios() {
                             className="w-full p-2 border rounded-lg"
                         />
                         
-                        {/* Campo Tipo com Placeholder */}
                         <select
                             value={tipo}
                             onChange={(e) => setTipo(e.target.value)}
@@ -169,7 +168,6 @@ export function Usuarios() {
                             <option value="funcionário">Funcionário</option>
                         </select>
 
-                        {/* Campo Status com Placeholder */}
                         <select
                             value={status}
                             onChange={(e) => setStatus(e.target.value)}

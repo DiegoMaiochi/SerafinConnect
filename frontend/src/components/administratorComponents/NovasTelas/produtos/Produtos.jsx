@@ -159,7 +159,6 @@ export function Produtos() {
                         <input type="text" placeholder="Descrição:" value={description} onChange={e => setDescription(e.target.value)} className="w-full p-2 border rounded-lg" />
 
                         <div className="flex space-x-2">
-                            {/* Grupo */}
                             <div className="w-1/2">
                                 <div className="relative">
                                     <button
@@ -187,7 +186,6 @@ export function Produtos() {
                                 </div>
                             </div>
 
-                            {/* Tipo */}
                             <div className="w-1/2">
                                 <div className="relative">
                                     <button
