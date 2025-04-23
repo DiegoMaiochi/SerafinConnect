@@ -20,7 +20,7 @@ export function Produtos() {
     const toggleForm = () => setShowForm(!showForm);
 
     const groups = [
-        "Drinks", "Cervejas", "Vinhos", "Não Alcoólicos", "Porçoes", "Doses", "Garrafas", "Combos"
+        "Drinks", "Cervejas", "Vinhos", "Não Alcoólicos", "Porções", "Doses", "Garrafas", "Combos"
     ];
 
     const fetchProducts = async () => {
@@ -158,54 +158,61 @@ export function Produtos() {
                         </div>
                         <input type="text" placeholder="Descrição:" value={description} onChange={e => setDescription(e.target.value)} className="w-full p-2 border rounded-lg" />
 
-                        <div className="flex justify-between space-x-2">
-                            <div className="relative w-full">
-                                <button
-                                    onClick={() => setShowGroupOptions(!showGroupOptions)}
-                                    className="w-full p-2 border rounded-lg bg-white text-left"
-                                >
-                                    {selectedGroup || "Selecione um grupo"}
-                                </button>
-                                {showGroupOptions && (
-                                    <ul className="absolute w-full bg-white border rounded-lg mt-1 shadow-lg z-10">
-                                        {groups.map((group, index) => (
-                                            <li
-                                                key={index}
-                                                onClick={() => {
-                                                    setSelectedGroup(group);
-                                                    setShowGroupOptions(false);
-                                                }}
-                                                className="p-1 cursor-pointer hover:bg-gray-200"
-                                            >
-                                                {group}
-                                            </li>
-                                        ))}
-                                    </ul>
-                                )}
+                        <div className="flex space-x-2">
+                            {/* Grupo */}
+                            <div className="w-1/2">
+                                <div className="relative">
+                                    <button
+                                        onClick={() => setShowGroupOptions(!showGroupOptions)}
+                                        className="w-full bg-white border border-gray-300 rounded-lg shadow-sm px-4 py-2 text-left text-gray-700"
+                                    >
+                                        {selectedGroup || "Grupo"}
+                                    </button>
+                                    {showGroupOptions && (
+                                        <ul className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-lg shadow-lg">
+                                            {groups.map((group, index) => (
+                                                <li
+                                                    key={index}
+                                                    onClick={() => {
+                                                        setSelectedGroup(group);
+                                                        setShowGroupOptions(false);
+                                                    }}
+                                                    className="px-4 py-1 cursor-pointer hover:bg-gray-100"
+                                                >
+                                                    {group}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    )}
+                                </div>
                             </div>
-                            <div className="relative w-full">
-                                <button
-                                    onClick={() => setShowTypeOptions(!showTypeOptions)}
-                                    className="w-full p-2 border rounded-lg bg-white text-left"
-                                >
-                                    {selectedType || "Selecione o tipo"}
-                                </button>
-                                {showTypeOptions && (
-                                    <ul className="absolute w-full bg-white border rounded-lg mt-1 shadow-lg z-10">
-                                        {["Kg", "Un"].map((type, index) => (
-                                            <li
-                                                key={index}
-                                                onClick={() => {
-                                                    setSelectedType(type);
-                                                    setShowTypeOptions(false);
-                                                }}
-                                                className="p-1 cursor-pointer hover:bg-gray-200"
-                                            >
-                                                {type}
-                                            </li>
-                                        ))}
-                                    </ul>
-                                )}
+
+                            {/* Tipo */}
+                            <div className="w-1/2">
+                                <div className="relative">
+                                    <button
+                                        onClick={() => setShowTypeOptions(!showTypeOptions)}
+                                        className="w-full bg-white border border-gray-300 rounded-lg shadow-sm px-4 py-2 text-left text-gray-700"
+                                    >
+                                        {selectedType || "Tipo"}
+                                    </button>
+                                    {showTypeOptions && (
+                                        <ul className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-lg shadow-lg">
+                                            {["Kg", "Un"].map((type, index) => (
+                                                <li
+                                                    key={index}
+                                                    onClick={() => {
+                                                        setSelectedType(type);
+                                                        setShowTypeOptions(false);
+                                                    }}
+                                                    className="px-4 py-1 cursor-pointer hover:bg-gray-100"
+                                                >
+                                                    {type}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    )}
+                                </div>
                             </div>
                         </div>
                     </div>
