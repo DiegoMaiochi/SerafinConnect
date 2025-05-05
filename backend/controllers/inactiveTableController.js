@@ -1,46 +1,44 @@
-const InactiveTableModel = require('../models/InactiveTableModel'); // Importe o modelo
+// controllers/inactiveTableController.js
+const InactiveTable = require('../models/inactiveTableModel');
 
-const inactiveTableController = {
-  getAllTables: async (req, res) => {
+const inactiveTableService = {
+  getAllTables: async () => {
     try {
-      const tables = await InactiveTableModel.getAllTables();
-      res.status(200).json(tables);
+      return await InactiveTable.findAll();
     } catch (error) {
-      res.status(500).json({ error: 'Erro ao obter lista de tabelas.' });
+      throw error;
     }
   },
-  getTable: async (req, res) => {
-    const id = req.params.id;
-    try {
-        const table = await InactiveTableModel.getTable(id);
-        res.status(200).json(table);
-    } catch (error) {
-        res.status(500).json({ error: 'Erro ao obter mesa com id ' + id });
-    }
-},
 
-
-  createNewInactiveTable: async (req, res) => {
-    const { status, identifier } = req.body;
+  getInactiveTable: async (id) => {
     try {
-      const newTable = await InactiveTableModel.createNewInactiveTable(status, identifier );
-      res.status(201).json(newTable);
+      return await InactiveTable.findByPk(id);
     } catch (error) {
-      res.status(500).json({ error: 'Erro ao criar nova mesa.' });
+      throw error;
     }
   },
-updateInativeTable: async (req, res) => {
-    const {status } = req.body;
-    const id  = req.params.id;
 
+  createNewInactiveTable: async (status, identifier) => {
     try {
-
-      const attTable = await InactiveTableModel.updateClient(status, id);
-      res.status(201).json(attTable);
+      const result = await InactiveTable.create({ status, identifier });
+      return result;
     } catch (error) {
-      res.status(500).json({ error: 'Erro ao atualizar a mesa com id .' + id });
+      throw error;
+    }
+  },
+
+  updateInativeTable: async (status, id) => {
+    try {
+      const table = await InactiveTable.findByPk(id);
+      if (!table) throw new Error('Registro não encontrado');
+
+      table.status = status;
+      await table.save();
+      return table;
+    } catch (error) {
+      throw error;
     }
   }
 };
 
-module.exports = inactiveTableController;
+module.exports = inactiveTableService;
