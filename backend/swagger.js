@@ -18,17 +18,49 @@ const options = {
       schemas: {
         Client: {
           type: 'object',
+          required: ['name', 'document', 'password'], // campos obrigatórios conforme o model
           properties: {
-            id: { type: 'integer', description: 'ID único do cliente' },
-            name: { type: 'string', description: 'Nome do cliente' },
-            document: { type: 'string', description: 'Número do documento do cliente' },
-            password: { type: 'string', description: 'Senha do cliente (hash)' },
-            phone: { type: 'string', description: 'Telefone do cliente' },
-            address: { type: 'string', description: 'Endereço do cliente' },
-            email: { type: 'string', description: 'E-mail do cliente' },
-            status: { type: 'boolean', description: 'Indica se o cliente está ativo', default: true }
+            id: {
+              type: 'integer',
+              readOnly: true,
+              description: 'ID único do cliente (gerado automaticamente)'
+            },
+            name: {
+              type: 'string',
+              description: 'Nome do cliente'
+            },
+            document: {
+              type: 'string',
+              description: 'Número único do documento do cliente'
+            },
+            password: {
+              type: 'string',
+              description: 'Senha do cliente (hash ou plaintext, dependendo do contexto de uso)'
+            },
+            phone: {
+              type: 'string',
+              nullable: true,
+              description: 'Telefone do cliente'
+            },
+            address: {
+              type: 'string',
+              nullable: true,
+              description: 'Endereço do cliente'
+            },
+            email: {
+              type: 'string',
+              format: 'email',
+              nullable: true,
+              description: 'E-mail do cliente'
+            },
+            status: {
+              type: 'boolean',
+              description: 'Indica se o cliente está ativo',
+              default: true
+            }
           }
         },
+        
         Cupom: {
           type: 'object',
           properties: {
