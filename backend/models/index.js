@@ -6,8 +6,8 @@ const Sequelize = require('sequelize');
 const process = require('process');
 const basename = path.basename(__filename);
 const env = process.env.NODE_ENV || 'development';
-const config = require(__dirname + '/../config/config.json')[env];
 const db = {};
+const config = require(path.join(__dirname, '..', 'config', 'config.js'))[env];
 
 let sequelize;
 if (config.use_env_variable) {
@@ -27,12 +27,15 @@ fs
     );
   })
   .forEach(file => {
-    const model = require(path.join(__dirname, file))(sequelize, Sequelize.DataTypes);
-    db[model.name] = model;
+    const model = require(path.join(__dirname, file));
+    if (typeof model.init === 'function') {
+      model.init(sequelize);
+      db[model.name] = model;
+    }
   });
 
 Object.keys(db).forEach(modelName => {
-  if (db[modelName].associate) {
+  if (typeof db[modelName].associate === 'function') {
     db[modelName].associate(db);
   }
 });

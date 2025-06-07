@@ -10,7 +10,7 @@ module.exports = {
     host: process.env.DB_HOST || '127.0.0.1',
     port: process.env.DB_PORT || 5432,
     dialect: 'postgres',
-    logging: false // Deixe como true para ver as queries no console
+    logging: false // Deixa como true para ver as queries no console
   }
  
 };

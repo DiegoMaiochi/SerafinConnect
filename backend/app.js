@@ -14,6 +14,8 @@ const stockRoutes = require('./routes/stockRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const discountRoutes = require('./routes/discountRoutes');
 const inactiveTableRoutes = require('./routes/inactiveTableRoutes');
+const authRoutes = require('./routes/authRoutes');
+
 
 app.use(express.json());
 app.use(cors());
@@ -26,6 +28,8 @@ app.use('/api', stockRoutes);
 app.use('/api', orderRoutes);
 app.use('/api', discountRoutes);
 app.use('/api', inactiveTableRoutes);
+app.use('/api', authRoutes);
+
 
 // Swagger
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));

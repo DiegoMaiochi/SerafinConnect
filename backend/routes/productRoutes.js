@@ -1,8 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const productController = require('../controllers/productController');
+const authToken = require('../middleware/authMiddleware'); //
 
-router.get('/produtos', productController.getAllProducts);
+router.get('/produtos', authToken,productController.getAllProducts);
 
 /**
  * @swagger
@@ -39,10 +40,10 @@ router.get('/produtos', productController.getAllProducts);
  *             example:
  *               error: "Produto não encontrado."
  */
-router.get('/produto/:id', productController.getProduct);
+router.get('/produto/:id', authToken, productController.getProduct);
 
-router.get('/produto/codigo/:id', productController.getProductByCode);
-router.get('/produto/descricao/:id', productController.getAllProductsByDescription);
+router.get('/produto/codigo/:id', authToken, productController.getProductByCode);
+router.get('/produto/descricao/:id', authToken, productController.getAllProductsByDescription);
 
 /**
  * @swagger
@@ -94,7 +95,7 @@ router.get('/produto/descricao/:id', productController.getAllProductsByDescripti
  *             example:
  *               error: "Erro ao criar novo produto."
  */
-router.post('/produto', productController.createNewProduct);
+router.post('/produto', authToken, productController.createNewProduct);
 
 /**
  * @swagger
@@ -143,7 +144,7 @@ router.post('/produto', productController.createNewProduct);
  *       404:
  *         description: Produto não encontrado
  */
-router.put('/produto/:id', productController.updateProduct);
+router.put('/produto/:id', authToken,productController.updateProduct);
 
 
 module.exports = router;

@@ -1,72 +1,80 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/sequelize');
-const DiscountCupom = require('./discountModel'); // Certifique-se de que o caminho está correto
+const { Model, DataTypes } = require('sequelize');
 
-const Order = sequelize.define('Order', {
-    id: {
-        type: DataTypes.UUID, // Identificador único do pedido
+class Order extends Model {
+  static init(sequelize) {
+    return super.init({
+      id: {
+        type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
         allowNull: false,
         primaryKey: true
-    },
-    totalOrder: {
+      },
+      totalOrder: {
         type: DataTypes.FLOAT,
         allowNull: false
-    },
-    paymentType: {
+      },
+      paymentType: {
         type: DataTypes.STRING,
         allowNull: false
-    },
-    status: {
+      },
+      status: {
         type: DataTypes.STRING,
         allowNull: false
-    },
-    tableId: {
+      },
+      tableId: {
         type: DataTypes.INTEGER,
         allowNull: false
-    },
-    clientId: {
+      },
+      clientId: {
         type: DataTypes.INTEGER,
         allowNull: false
-    },
-    creationDate: {
+      },
+      creationDate: {
         type: DataTypes.DATE,
         allowNull: false,
         defaultValue: DataTypes.NOW
-    },
-    discount: {
+      },
+      discount: {
         type: DataTypes.FLOAT,
         allowNull: true,
         defaultValue: 0
-    },
-    couponId: {
+      },
+      couponId: {
         type: DataTypes.UUID,
         allowNull: true,
         references: {
-            model: 'DiscountCupoms',
-            key: 'id'
+          model: 'discountcupoms',  // nome da tabela em minúsculo (verifique o nome real)
+          key: 'id'
         }
-    }
-}, {
-    timestamps: true, // Adiciona createdAt e updatedAt automaticamente
-    tableName: 'orders'
-});
+      }
+    }, {
+      sequelize,
+      tableName: 'orders',
+      timestamps: true,
+      modelName: 'Order'
+    });
+  }
 
-// Relacionamento com DiscountCupom
-Order.belongsTo(DiscountCupom, { foreignKey: 'couponId', targetKey: 'id' });
-const ItensPedido = require('./itemPedido');
-const Product = require('./productModel');
+  static associate(models) {
+    this.belongsTo(models.DiscountCupom, { foreignKey: 'couponId', targetKey: 'id' });
 
-Order.belongsToMany(Product, {
-  through: ItensPedido,
-  foreignKey: 'orderId',
-  otherKey: 'productId'
-});
+    this.belongsTo(models.Client, { foreignKey: 'clientId', as: 'cliente' });
 
-Product.belongsToMany(Order, {
-  through: ItensPedido,
-  foreignKey: 'productId',
-  otherKey: 'orderId'
-});
+    this.belongsToMany(models.Product, {
+      through: models.ItensPedido,
+      foreignKey: 'orderId',
+      otherKey: 'productId'
+    });
+
+    models.Product.belongsToMany(this, {
+      through: models.ItensPedido,
+      foreignKey: 'productId',
+      otherKey: 'orderId'
+    });
+
+    // Se quiser usar hasMany para itens:
+    this.hasMany(models.ItensPedido, { foreignKey: 'orderId', as: 'ItensPedido' });
+  }
+}
 
 module.exports = Order;

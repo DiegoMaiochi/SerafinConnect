@@ -51,6 +51,37 @@ const clientController = {
     }
   },
 
+    searchClientsByName: async (req, res) => {
+    const { name = '', page = 1, limit = 10 } = req.query;
+    const offset = (page - 1) * limit;
+
+    if (!name) {
+      return res.status(400).json({ error: 'Parâmetro "name" é obrigatório para busca.' });
+    }
+
+    try {
+      const { count, rows } = await Client.findAndCountAll({
+        where: {
+          name: { [Op.iLike]: `%${name}%` }
+        },
+        limit: parseInt(limit),
+        offset: parseInt(offset),
+        attributes: { exclude: ['password'] },
+        order: [['name', 'ASC']]
+      });
+
+      res.status(200).json({
+        data: rows,
+        total: count,
+        totalPages: Math.ceil(count / limit),
+        page: Number(page),
+      });
+    } catch (error) {
+      console.error('Erro ao buscar clientes por nome:', error);
+      res.status(500).json({ error: 'Erro ao buscar clientes por nome.' });
+    }
+  },
+
   getClient: async (req, res) => {
     const { id } = req.params;
 

@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const clientController = require('../controllers/clientController');
+const authToken = require('../middleware/authMiddleware');
+
 
 /**
  * @swagger
@@ -140,5 +142,6 @@ router.post('/clientes', clientController.createNewClient);
  *         description: Erro ao atualizar cliente - dados inválidos
  */
 router.put('/cliente/:id', clientController.updateClient);
+router.get('/clientes/search', clientController.searchClientsByName);
 
 module.exports = router;

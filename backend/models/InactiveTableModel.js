@@ -1,24 +1,32 @@
-// models/inactiveTableModel.js
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/sequelize');
+const { Model, DataTypes } = require('sequelize');
 
-const InactiveTable = sequelize.define('InactiveTable', {
-    id: {
+class InactiveTable extends Model {
+  static init(sequelize) {
+    return super.init({
+      id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
         primaryKey: true
-    },
-    status: {
+      },
+      status: {
         type: DataTypes.BOOLEAN,
         allowNull: false
-    },
-    identifier: {
+      },
+      identifier: {
         type: DataTypes.STRING,
         allowNull: false
-    }
-}, {
-    tableName: 'inactiveTable',
-    timestamps: false
-});
+      }
+    }, {
+      sequelize,
+      tableName: 'inactiveTable',
+      timestamps: false,
+      modelName: 'InactiveTable'
+    });
+  }
+
+  static associate(models) {
+    // Caso futuramente tenha associações, defina aqui
+  }
+}
 
 module.exports = InactiveTable;

@@ -1,28 +1,32 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/sequelize');
-const Product = require('./productModel');
+const { Model, DataTypes } = require('sequelize');
 
-const Price = sequelize.define('Price', {
-    productId: {
+class Price extends Model {
+  static init(sequelize) {
+    return super.init({
+      productId: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         references: {
-            model: Product,
-            key: 'id'
+          model: 'product', // nome da tabela, evita dependência circular
+          key: 'id'
         }
-    },
-    price: {
+      },
+      price: {
         type: DataTypes.FLOAT,
         allowNull: false
-    }
-}, {
-    tableName: "price",
+      }
+    }, {
+      sequelize,
+      tableName: 'price',
+      timestamps: true,
+      modelName: 'Price'
+    });
+  }
 
-    timestamps: true
-});
-
-// Relacionamento com Product
-Product.hasOne(Price, { foreignKey: 'productId' });
-Price.belongsTo(Product, { foreignKey: 'productId' });
+  static associate(models) {
+    this.belongsTo(models.Product, { foreignKey: 'productId' });
+    models.Product.hasOne(this, { foreignKey: 'productId' });
+  }
+}
 
 module.exports = Price;

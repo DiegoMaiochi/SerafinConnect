@@ -1,30 +1,39 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/sequelize'); // Certifique-se de que está importando a instância correta
+const { Model, DataTypes } = require('sequelize');
 
-const DiscountCupom = sequelize.define('DiscountCupom', {
-    id: {
-        type: DataTypes.UUID, // Identificador único
+class DiscountCupom extends Model {
+  static init(sequelize) {
+    return super.init({
+      id: {
+        type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
         allowNull: false,
         primaryKey: true
-    },
-    code: {
+      },
+      code: {
         type: DataTypes.STRING,
         allowNull: false,
-        unique: true // Garante que cada cupom tenha um código único
-    },
-    usageLimit: {
-        type: DataTypes.INTEGER, // Número máximo de utilizações
+        unique: true
+      },
+      usageLimit: {
+        type: DataTypes.INTEGER,
         allowNull: false,
         defaultValue: 1
-    },
-    discountValue: {
-        type: DataTypes.FLOAT, // Valor do desconto
+      },
+      discountValue: {
+        type: DataTypes.FLOAT,
         allowNull: false
-    }
-}, {
-    timestamps: true, // Adiciona createdAt e updatedAt automaticamente
-    tableName: 'discount_cupoms'
-});
+      }
+    }, {
+      sequelize,
+      tableName: 'discount_cupoms',
+      timestamps: true,
+      modelName: 'DiscountCupom'
+    });
+  }
+
+  static associate(models) {
+    // Defina associações aqui, se houver
+  }
+}
 
 module.exports = DiscountCupom;

@@ -1,20 +1,36 @@
-const { Op } = require('sequelize');  
+const { Op } = require('sequelize');
 const orderModel = require('../models/orderModel');
-const DiscountCupom = require('../models/discountModel'); 
-const Order = require('../models/orderModel'); 
-const Product = require('../models/productModel'); 
+const DiscountCupom = require('../models/discountModel');
+const { Order, Client, ItensPedido } = require('../models'); // ✅ CERTO
+const Product = require('../models/productModel');
 const sequelize = require('../config/sequelize')
-const ItensPedido = require('../models/itemPedido')
 
 const orderController = {
     getAllOrders: async (req, res) => {
         try {
-            const orders = await orderModel.findAll();
+            const orders = await Order.findAll({
+                include: [
+                    {
+                        model: Client,
+                        as: 'cliente',
+                        attributes: ['id', 'name', 'document', 'phone', 'address']
+                    },
+                    {
+                        model: ItensPedido,
+                        as: 'ItensPedido',
+                        attributes: ['orderId', 'productId', 'quantity', 'price']
+                    }
+                ]
+            });
             res.status(200).json(orders);
         } catch (error) {
+            console.error(error);
             res.status(500).json({ error: 'Erro ao obter lista de pedidos.' });
         }
     },
+
+
+
 
     getOrder: async (req, res) => {
         const id = req.params.id;
@@ -31,16 +47,16 @@ const orderController = {
 
     createNewOrder: async (req, res) => {
         const { items, totalOrder, paymentType, status, tableId, clientId, couponCode } = req.body;
-    
+
         if (!items || !totalOrder || !paymentType || !status || !tableId) {
             return res.status(400).json({ error: 'Campos obrigatórios: items, totalOrder, paymentType, status e tableId.' });
         }
-    
+
         let discount = 0;
         let couponId = null;
-    
+
         const transaction = await sequelize.transaction();
-    
+
         try {
             // Validação e aplicação do cupom
             if (couponCode) {
@@ -51,21 +67,21 @@ const orderController = {
                     },
                     transaction
                 });
-    
+
                 if (!coupon) {
                     await transaction.rollback();
                     return res.status(400).json({ error: 'Cupom inválido ou expirado.' });
                 }
-    
+
                 discount = coupon.discountValue;
                 couponId = coupon.id;
-    
+
                 await coupon.update(
                     { usageLimit: coupon.usageLimit - 1 },
                     { transaction }
                 );
             }
-    
+
             // Criação do pedido
             const newOrder = await Order.create({
                 totalOrder: totalOrder - discount,
@@ -76,32 +92,35 @@ const orderController = {
                 discount,
                 couponId
             }, { transaction });
-    
+
             // Inserção dos itens
             for (const item of items) {
+                console.log("Item recebido do front:", item);
+
                 await ItensPedido.create({
                     orderId: newOrder.id,
                     productId: item.id,
-                    quantity: item.quantity
+                    quantity: item.quantity,
+                    price: item.price // <- Aqui o valor é armazenado
                 }, { transaction });
-    
-                // Atualização de estoque (se necessário)
+
                 const product = await Product.findByPk(item.id, { transaction });
-    
+
                 if (!product) {
                     throw new Error(`Produto ID ${item.id} não encontrado`);
                 }
-    
+
                 const newStock = product.quantity - item.quantity;
                 if (newStock < 0) {
                     throw new Error(`Estoque insuficiente para produto ${item.id}`);
                 }
-    
+
                 await product.update({ quantity: newStock }, { transaction });
             }
-    
+
+
             await transaction.commit();
-    
+
             res.status(201).json({
                 message: `Pedido criado com sucesso! ID = ${newOrder.id}`,
                 order: newOrder

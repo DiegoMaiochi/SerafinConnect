@@ -1,42 +1,51 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/sequelize'); // Importando a instância do Sequelize
+const { Model, DataTypes } = require('sequelize');
 
-const Product = sequelize.define('Product', {
-    id: {
+class Product extends Model {
+  static init(sequelize) {
+    return super.init({
+      id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true
-    },
-    name: {
+      },
+      name: {
         type: DataTypes.STRING,
         allowNull: false
-    },
-    ean: {
+      },
+      ean: {
         type: DataTypes.STRING,
         unique: true,
         allowNull: false
-    },
-    description: {
+      },
+      description: {
         type: DataTypes.TEXT,
         allowNull: true
-    },
-    group: {
+      },
+      group: {
         type: DataTypes.STRING,
         allowNull: false
-    },
-    type: {
+      },
+      type: {
         type: DataTypes.STRING,
         allowNull: false
-    },
-    
-    status: {
-        type: DataTypes.ENUM('active', 'inactive'), // Define os valores possíveis
-        defaultValue: 'active', // Define o padrão como "active"
+      },
+      status: {
+        type: DataTypes.ENUM('active', 'inactive'),
+        defaultValue: 'active',
         allowNull: false
-    }
-}, {
-    tableName: 'product',    
-    timestamps: true
-});
+      }
+    }, {
+      sequelize,
+      tableName: 'product',
+      timestamps: true,
+      modelName: 'Product'
+    });
+  }
+
+  static associate(models) {
+    // Se precisar, defina associações aqui, por exemplo:
+    // this.hasOne(models.Stock, { foreignKey: 'productId' });
+  }
+}
 
 module.exports = Product;
