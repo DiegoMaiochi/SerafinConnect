@@ -4,11 +4,11 @@ class ItensPedido extends Model {
   static init(sequelize) {
     return super.init({
       orderId: {
-        type: DataTypes.UUID,   // Deve ser UUID para casar com Order
+        type: DataTypes.UUID,
         allowNull: false,
         primaryKey: true,
         references: {
-          model: 'orders',  // nome da tabela Order (em minúsculo)
+          model: 'orders',
           key: 'id'
         }
       },
@@ -17,12 +17,16 @@ class ItensPedido extends Model {
         allowNull: false,
         primaryKey: true,
         references: {
-          model: 'product', // nome da tabela Product (confirme o nome real)
+          model: 'product',
           key: 'id'
         }
       },
       quantity: {
         type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      price: {
+        type: DataTypes.DECIMAL(10, 2), // <-- Adicionado aqui
         allowNull: false,
       }
     }, {

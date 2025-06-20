@@ -15,6 +15,7 @@ const orderRoutes = require('./routes/orderRoutes');
 const discountRoutes = require('./routes/discountRoutes');
 const inactiveTableRoutes = require('./routes/inactiveTableRoutes');
 const authRoutes = require('./routes/authRoutes');
+const employeeRoutes = require('./routes/employeeRoutes');
 
 
 app.use(express.json());
@@ -29,7 +30,7 @@ app.use('/api', orderRoutes);
 app.use('/api', discountRoutes);
 app.use('/api', inactiveTableRoutes);
 app.use('/api', authRoutes);
-
+app.use('/api',employeeRoutes)
 
 // Swagger
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));

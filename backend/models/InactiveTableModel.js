@@ -23,9 +23,8 @@ class InactiveTable extends Model {
       modelName: 'InactiveTable'
     });
   }
-
   static associate(models) {
-    // Caso futuramente tenha associações, defina aqui
+    // associações futuras
   }
 }
 

@@ -4,11 +4,12 @@ class DiscountCupom extends Model {
   static init(sequelize) {
     return super.init({
       id: {
-        type: DataTypes.UUID,
-        defaultValue: DataTypes.UUIDV4,
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
         allowNull: false,
         primaryKey: true
       },
+
       code: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -32,8 +33,12 @@ class DiscountCupom extends Model {
   }
 
   static associate(models) {
-    // Defina associações aqui, se houver
+    this.hasMany(models.LogCupom, {
+      foreignKey: 'cupom_id',
+      as: 'logs'
+    });
   }
+
 }
 
 module.exports = DiscountCupom;

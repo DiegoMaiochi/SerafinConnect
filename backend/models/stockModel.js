@@ -26,6 +26,10 @@ class Stock extends Model {
   static associate(models) {
     this.belongsTo(models.Product, { foreignKey: 'productId' });
     models.Product.hasOne(this, { foreignKey: 'productId' });
+    this.hasMany(models.LogEstoque, {
+      foreignKey: 'product_id',
+      as: 'logs'
+    });
   }
 }
 

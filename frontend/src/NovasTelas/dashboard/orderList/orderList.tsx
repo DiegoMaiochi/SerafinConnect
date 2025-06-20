@@ -1,7 +1,7 @@
 import { useState } from "react";
 import PedidoDetalhesModal from "./OrderDetailModal";
 
-const PedidoList = ({ pedidos }) => {
+const PedidoList = ({ pedidos,onEditPedido  }) => {
     const [pedidoSelecionado, setPedidoSelecionado] = useState(null);
 
     const handlePedidoClick = (pedido) => {
@@ -15,28 +15,43 @@ const PedidoList = ({ pedidos }) => {
     return (
         <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {pedidos.map((pedido) => (
-                <div
-                    key={pedido.id}
-                    onClick={() => handlePedidoClick(pedido)}
-                    className="bg-white p-4 rounded-xl shadow cursor-pointer hover:shadow-lg transition"
-                >
-                    <div className="font-bold text-lg text-red-500">
-                        {pedido.cliente?.name || "Cliente não informado"}
-                    </div>
-                    <div className="text-sm text-gray-600">
-                        Mesa: {pedido.tableId || "N/A"}
-                    </div>
-                    <div className="text-sm text-gray-600">
-                        Pagamento: {pedido.paymentType || "Não informado"}
-                    </div>
-                    <div className="text-sm text-gray-600">
-                        Status: {pedido.status}
-                    </div>
-                    <div className="text-sm text-gray-600">
-                        Total: R$ {pedido.totalOrder?.toFixed(2) || "0.00"}
-                    </div>
-                </div>
-            ))}
+    <div
+        key={pedido.id}
+        className="bg-white p-4 rounded-xl shadow hover:shadow-lg transition"
+    >
+        <div className="font-bold text-lg text-red-500">
+            {pedido.cliente?.name || "Cliente não informado"}
+        </div>
+        <div className="text-sm text-gray-600">
+            Mesa: {pedido.tableId || "N/A"}
+        </div>
+        <div className="text-sm text-gray-600">
+            Pagamento: {pedido.paymentType || "Não informado"}
+        </div>
+        <div className="text-sm text-gray-600">
+            Status: {pedido.status}
+        </div>
+        <div className="text-sm text-gray-600 mb-2">
+            Total: R$ {pedido.totalOrder?.toFixed(2) || "0.00"}
+        </div>
+
+        <div className="flex justify-between">
+            <button
+                onClick={() => setPedidoSelecionado(pedido)}
+                className="text-sm text-blue-600 hover:underline"
+            >
+                Ver Detalhes
+            </button>
+            <button
+                onClick={() => onEditPedido(pedido)}
+                className="text-sm text-green-600 hover:underline"
+            >
+                Editar
+            </button>
+        </div>
+    </div>
+))}
+
     
             {pedidoSelecionado && (
                 <PedidoDetalhesModal

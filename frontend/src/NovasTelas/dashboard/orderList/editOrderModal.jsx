@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 
-function EditPedidoModal({ pedido, onClose, onUpdate }) {
+function EditPedidoModal({ pedido, onClose, onUpdate, employeeId }) { 
+  // employeeId = id do funcionário que está editando o pedido, passado pelo componente pai
+
   const [status, setStatus] = useState(pedido.status);
   const [paymentType, setPaymentType] = useState(pedido.paymentType);
 
@@ -13,7 +15,8 @@ function EditPedidoModal({ pedido, onClose, onUpdate }) {
     const pedidoAtualizado = {
       ...pedido,
       status,
-      paymentType
+      paymentType,
+      employeeId, // envia o id do funcionário que atualizou o pedido
     };
     onUpdate(pedidoAtualizado);
   };

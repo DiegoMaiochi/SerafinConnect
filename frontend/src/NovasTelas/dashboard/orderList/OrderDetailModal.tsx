@@ -1,9 +1,11 @@
 import { X } from "lucide-react";
 
 interface Item {
-    nome: string;
-    quantidade: number;
-    preco: number;
+    product: {
+        name: string
+    };
+    quantity: number;
+    price: number;
 }
 
 interface Cliente {
@@ -13,11 +15,11 @@ interface Cliente {
 interface Pedido {
     id: string;
     cliente?: Cliente;
-    mesa?: string;
-    metodoPagamento?: string;
+    tableId?: string;
+    paymentType?: string;
     status: string;
-    total?: number;
-    itens?: Item[];
+    totalOrder?: number;
+    ItensPedido?: Item[];
 }
 
 interface PedidoDetalhesModalProps {
@@ -41,22 +43,22 @@ const PedidoDetalhesModal: React.FC<PedidoDetalhesModalProps> = ({ pedido, onClo
                 {/* Cabeçalho */}
                 <div className="mb-4 space-y-1">
                     <div><strong>Cliente:</strong> {pedido.cliente?.name || "N/A"}</div>
-                    <div><strong>Mesa:</strong> {pedido.mesa || "N/A"}</div>
-                    <div><strong>Método de Pagamento:</strong> {pedido.metodoPagamento || "N/A"}</div>
+                    <div><strong>Mesa:</strong> {pedido.tableId || "N/A"}</div>
+                    <div><strong>Método de Pagamento:</strong> {pedido.paymentType || "N/A"}</div>
                     <div><strong>Status:</strong> {pedido.status}</div>
-                    <div><strong>Total:</strong> R$ {pedido.total?.toFixed(2) || "0.00"}</div>
+                    <div><strong>Total:</strong> R$ {pedido.totalOrder?.toFixed(2) || "0.00"}</div>
                 </div>
 
                 {/* Itens */}
                 <div>
                     <h3 className="text-lg font-semibold mb-2">Itens do Pedido</h3>
-                    {pedido.itens && pedido.itens.length > 0 ? (
+                    {pedido.ItensPedido && pedido.ItensPedido.length > 0 ? (
                         <ul className="space-y-2">
-                            {pedido.itens.map((item, index) => (
+                            {pedido.ItensPedido.map((item, index) => (
                                 <li key={index} className="border p-2 rounded-md">
-                                    <div><strong>Produto:</strong> {item.nome}</div>
-                                    <div><strong>Quantidade:</strong> {item.quantidade}</div>
-                                    <div><strong>Preço:</strong> R$ {item.preco?.toFixed(2)}</div>
+                                    <div><strong>Produto:</strong> {item.product.name}</div>
+                                    <div><strong>Quantidade:</strong> {item.quantity}</div>
+                                    <div><strong>Preço:</strong> R$ {item.price?.toFixed(2)}</div>
                                 </li>
                             ))}
                         </ul>

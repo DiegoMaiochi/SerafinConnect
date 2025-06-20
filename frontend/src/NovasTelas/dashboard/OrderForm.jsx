@@ -154,7 +154,7 @@ const OrderForm = ({ onSubmit }) => {
 
       if (response.ok) {
         alert("Pedido enviado com sucesso!");
-        onSubmit && onSubmit(payload);
+     onSubmit && onSubmit(payload);
         // Reseta form após envio (opcional)
         setFormData({
           items: [{ id: "", quantity: 1, price: 0 }],

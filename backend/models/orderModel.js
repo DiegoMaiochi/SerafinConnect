@@ -43,9 +43,35 @@ class Order extends Model {
         type: DataTypes.UUID,
         allowNull: true,
         references: {
-          model: 'discountcupoms',  // nome da tabela em minúsculo (verifique o nome real)
+          model: 'discountcupoms',  // confirme o nome correto da tabela
           key: 'id'
         }
+      },
+
+      // Novos campos para vincular o funcionário
+      cancelledById: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        references: {
+          model: 'employees', // nome da tabela Employee, confirme
+          key: 'id'
+        }
+      },
+      completedById: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        references: {
+          model: 'employees',
+          key: 'id'
+        }
+      },
+      cancelledAt: {
+        type: DataTypes.DATE,
+        allowNull: true
+      },
+      completedAt: {
+        type: DataTypes.DATE,
+        allowNull: true
       }
     }, {
       sequelize,
@@ -57,7 +83,6 @@ class Order extends Model {
 
   static associate(models) {
     this.belongsTo(models.DiscountCupom, { foreignKey: 'couponId', targetKey: 'id' });
-
     this.belongsTo(models.Client, { foreignKey: 'clientId', as: 'cliente' });
 
     this.belongsToMany(models.Product, {
@@ -72,8 +97,11 @@ class Order extends Model {
       otherKey: 'orderId'
     });
 
-    // Se quiser usar hasMany para itens:
     this.hasMany(models.ItensPedido, { foreignKey: 'orderId', as: 'ItensPedido' });
+
+    // Associações para funcionário que cancelou/completou
+    this.belongsTo(models.Employee, { as: 'cancelledBy', foreignKey: 'cancelledById' });
+    this.belongsTo(models.Employee, { as: 'completedBy', foreignKey: 'completedById' });
   }
 }
 

@@ -193,6 +193,6 @@ router.get('/pedidos/tipoPagamento', orderController.getOrdersByPaymentType);
  *                       total_orders:
  *                         type: integer
  */
-router.get('/pedidos/tipoPagamento&data', orderController.getPaymentReportByDateRange);
+router.get('/relatorios/pagamento', orderController.getPaymentReportByDateRange);
 
 module.exports = router;

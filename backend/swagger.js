@@ -60,7 +60,7 @@ const options = {
             }
           }
         },
-        
+
         Cupom: {
           type: 'object',
           properties: {
@@ -132,7 +132,46 @@ const options = {
             productId: { type: 'integer', description: 'ID do produto associado ao estoque' },
             quantity: { type: 'integer', description: 'Quantidade disponível do produto' }
           }
+        },
+        Employee: {
+          type: 'object',
+          required: ['name', 'document', 'password'],
+          properties: {
+            id: {
+              type: 'integer',
+              readOnly: true,
+              description: 'ID único do funcionário (gerado automaticamente)'
+            },
+            name: {
+              type: 'string',
+              description: 'Nome do funcionário'
+            },
+            document: {
+              type: 'string',
+              description: 'Número do documento do funcionário (ex: CPF)'
+            },
+            password: {
+              type: 'string',
+              description: 'Senha do funcionário (armazenada com hash)'
+            },
+            active: {
+              type: 'boolean',
+              description: 'Status do funcionário (ativo ou inativo)',
+              default: true
+            },
+            createdAt: {
+              type: 'string',
+              format: 'date-time',
+              description: 'Data de criação do funcionário'
+            },
+            updatedAt: {
+              type: 'string',
+              format: 'date-time',
+              description: 'Data de atualização do funcionário'
+            }
+          }
         }
+
       }
     }
   },

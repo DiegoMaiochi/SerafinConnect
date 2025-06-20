@@ -1,9 +1,12 @@
 import { useState } from "react";
 import { FiGrid, FiHome, FiPackage, FiSettings, FiTag, FiUser, FiLogOut, FiArchive } from "react-icons/fi";
+import { GrUserWorker } from "react-icons/gr";
+
 import { Dashboard } from "./dashboard/Dashboard";
 import { Usuarios } from "./usuarios/Usuarios";
 import { Produtos } from "./produtos/Produtos";
 import { Cupons } from "./cupons/Cupons";
+import { Funcionarios } from "./employee/Funcionarios";
 import { Mesas } from "./mesas/Mesas";
 import { authService } from "../services/authService";
 import { Estoque } from "./Stock/stock";
@@ -33,7 +36,8 @@ export function SideBar() {
                 return <Mesas />;
             case "Estoque":
                 return <Estoque />;
-
+            case "Funcionarios":
+                return <Funcionarios />;
             default:
                 return <Dashboard />;
         }
@@ -54,6 +58,8 @@ export function SideBar() {
                     <FiPackage size={60} className={`cursor-pointer ${getIconClass("Produtos")}`} onClick={() => setActiveComponent("Produtos")} />
                     <FiTag size={60} className={`cursor-pointer ${getIconClass("Cupons")}`} onClick={() => setActiveComponent("Cupons")} />
                     <FiGrid size={60} className={`cursor-pointer ${getIconClass("Mesas")}`} onClick={() => setActiveComponent("Mesas")} />
+                    <GrUserWorker  size={60} className={`cursor-pointer ${getIconClass("Funcionarios")}`} onClick={() => setActiveComponent("Funcionarios")} />
+
                     <FiArchive
                         size={60}
                         className={`mx-auto cursor-pointer ${getIconClass("Estoque")}`}

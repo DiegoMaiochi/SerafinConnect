@@ -1,10 +1,19 @@
 import React, { useState, useEffect } from "react";
-import { Search, Filter, List, PlusCircle, X } from "lucide-react";
+import { Search, Filter, List, PlusCircle, X, FileText } from "lucide-react";
 import OrderForm from "./OrderForm";
 import PedidoList from "./orderList/orderList";
-import EditPedidoModal from "./orderList/editOrderModal"; // Certifique-se de que esse caminho está correto
+import EditPedidoModal from "./orderList/editOrderModal";
+import RelatorioModal from "./RelatorioModal";
+import GenerateReportModal from "./reports/GenerateReportModal";
+
+
 
 export function Dashboard() {
+    const [isRelatorioModalOpen, setIsRelatorioModalOpen] = useState(false);
+    const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+
+    const handleOpenRelatorioModal = () => setIsRelatorioModalOpen(true);
+    const handleCloseRelatorioModal = () => setIsRelatorioModalOpen(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editModalOpen, setEditModalOpen] = useState(false);
     const [pedidoList, setPedidoList] = useState([]);
@@ -40,25 +49,9 @@ export function Dashboard() {
         fetchPedidos();
     }, []);
 
-    const handleOrderSubmit = async (orderData) => {
-        try {
-            const response = await fetch("http://localhost:3000/api/pedido", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(orderData),
-            });
-
-            if (response.ok) {
-                alert("Pedido enviado com sucesso!");
-                handleCloseModal();
-                fetchPedidos();
-            } else {
-                alert("Erro ao enviar o pedido.");
-            }
-        } catch (error) {
-            console.error("Erro ao enviar pedido:", error);
-            alert("Erro ao enviar o pedido.");
-        }
+    const handleOrderSubmit = () => {
+        handleCloseModal();     // Fecha o modal
+        fetchPedidos();         // Atualiza a lista de pedidos
     };
 
     const handlePedidoUpdate = async (pedidoAtualizado) => {
@@ -98,6 +91,14 @@ export function Dashboard() {
             </div>
 
             <div className="flex flex-wrap mt-4 ml-2 md:ml-10 gap-2">
+                <div>
+                    <button
+                        onClick={() => setIsReportModalOpen(true)}
+                        className="bg-red-400 p-2 pl-4 pr-4 rounded-2xl font-bold ml-2 flex items-center hover:bg-red-500 transition-colors"
+                    >
+                        <FileText size={20} className="mr-2" /> Gerar Relatório
+                    </button>
+                </div>
                 <div className="bg-gray-200 w-full sm:w-4/5 p-1 rounded-2xl flex items-center">
                     <Search size={25} className="text-red-500 ml-2" />
                     <input
@@ -108,6 +109,15 @@ export function Dashboard() {
                         onChange={e => setSearchTerm(e.target.value)}
                     />
                 </div>
+
+
+                {isReportModalOpen && (
+                    <GenerateReportModal onClose={() => setIsReportModalOpen(false)} />
+                )}
+
+
+
+
                 <div className="flex gap-2 ml-2">
                     <Filter size={25} className="text-red-500 cursor-pointer" />
                     <List size={25} className="text-red-500 cursor-pointer" />
@@ -117,6 +127,8 @@ export function Dashboard() {
                     >
                         <PlusCircle size={20} className="mr-2" /> Adicionar Pedido
                     </button>
+
+
                 </div>
             </div>
 
@@ -152,10 +164,13 @@ export function Dashboard() {
             )}
 
             {editModalOpen && pedidoSelecionado && (
+
                 <EditPedidoModal
+
                     pedido={pedidoSelecionado}
                     onClose={handleCloseEditModal}
                     onUpdate={handlePedidoUpdate}
+                    employeeId={1}
                 />
             )}
         </div>

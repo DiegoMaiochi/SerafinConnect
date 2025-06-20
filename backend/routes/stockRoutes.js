@@ -74,5 +74,7 @@ router.get('/estoque/:id', stockController.getStock);
  *         description: Erro no servidor
  */
 router.put('/estoque/:id', stockController.updateStock);
+router.get('/estoque/logs/:productId', stockController.getStockLogs);
+router.get('/logs-periodo', stockController.getStockLogsByPeriod);
 
 module.exports = router;

@@ -18,7 +18,14 @@ const orderController = {
                     {
                         model: ItensPedido,
                         as: 'ItensPedido',
-                        attributes: ['orderId', 'productId', 'quantity', 'price']
+                        attributes: ['orderId', 'productId', 'quantity', 'price'],
+                        include: [
+                            {
+                                model: Product,
+                                as: 'product',
+                                attributes: ['id', 'name'] 
+                            }
+                        ]
                     }
                 ]
             });
@@ -101,7 +108,7 @@ const orderController = {
                     orderId: newOrder.id,
                     productId: item.id,
                     quantity: item.quantity,
-                    price: item.price // <- Aqui o valor é armazenado
+                    price: item.price
                 }, { transaction });
 
                 const product = await Product.findByPk(item.id, { transaction });
@@ -133,23 +140,43 @@ const orderController = {
     },
 
     updateOrder: async (req, res) => {
-        const { status } = req.body;
+        const { status, employeeId } = req.body; // employeeId deve vir no corpo da requisição
         const id = req.params.id;
 
+        if (!employeeId) {
+            return res.status(400).json({ error: 'ID do funcionário é obrigatório para atualizar o pedido.' });
+        }
+
         try {
-            const order = await orderModel.findByPk(id);
+            const order = await Order.findByPk(id);
             if (!order) {
                 return res.status(404).json({ error: 'Pedido não encontrado.' });
             }
 
             order.status = status;
+
+            // Atualiza o vínculo com o funcionário dependendo do status
+            if (status.toLowerCase() === 'cancelado' || status.toLowerCase() === 'cancelled') {
+                order.cancelledById = employeeId;
+                order.completedById = null; // limpa se estava preenchido
+            } else if (status.toLowerCase() === 'completo' || status.toLowerCase() === 'completed') {
+                order.completedById = employeeId;
+                order.cancelledById = null; // limpa se estava preenchido
+            } else {
+                // Se status for outro, limpa os dois campos (ou mantém, dependendo da regra de negócio)
+                order.cancelledById = null;
+                order.completedById = null;
+            }
+
             await order.save();
 
             res.status(200).json(order);
         } catch (error) {
+            console.error('Erro ao atualizar o pedido:', error);
             res.status(500).json({ error: 'Erro ao atualizar o pedido com id ' + id });
         }
     },
+
 
     getOrdersByPaymentType: async (req, res) => {
         try {
