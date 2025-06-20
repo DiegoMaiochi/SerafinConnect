@@ -19,48 +19,40 @@ const OrderForm = ({ onSubmit }) => {
     couponCode: ""
   });
 
-  // Busca produtos
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         const response = await fetch(`${api}/api/produtos`, {
           headers: {
-            Authorization: `Bearer ${token}`
-          }
+            Authorization: `Bearer ${token}`,
+          },
         });
         const data = await response.json();
-        setProducts(data);
+        setProducts(Array.isArray(data) ? data : []);
       } catch (error) {
-        console.error("Erro ao carregar produtos:", error);
+        console.error("Erro ao buscar produtos:", error);
+        setProducts([]);
       }
     };
-
     fetchProducts();
   }, [api, token]);
 
-  // Busca clientes conforme digita
   useEffect(() => {
     const fetchClients = async () => {
       if (clientSearch.trim().length < 2) return;
-
       try {
-        const response = await fetch(`${api}/api/clientes/search?name=${(clientSearch)}`, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
+        const response = await fetch(`${api}/api/clientes/search?name=${clientSearch}`, {
+          headers: { Authorization: `Bearer ${token}` }
         });
         const responseData = await response.json();
-        setClientSuggestions(responseData.data); 
-
+        setClientSuggestions(responseData.data);
       } catch (error) {
         console.error("Erro ao buscar clientes:", error);
       }
     };
-
     fetchClients();
   }, [clientSearch, api, token]);
 
-  // Recalcula o total do pedido
   const calculateTotal = (items) => {
     return items.reduce((sum, item) => {
       const qty = Number(item.quantity) || 0;
@@ -69,26 +61,24 @@ const OrderForm = ({ onSubmit }) => {
     }, 0);
   };
 
-  // Atualiza formData genérico (tableId, paymentType, status, couponCode)
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  // Atualiza item específico no array (produto, quantidade, preço)
   const handleItemChange = (index, field, value) => {
     const updatedItems = [...formData.items];
-    updatedItems[index] = { ...updatedItems[index], [field]: value };
 
-    // Se mudar produto, atualiza preço padrão do produto
     if (field === "id") {
-      const product = products.find(p => p.id === value);
+      updatedItems[index].id = value;
+      const product = products.find(p => String(p.id) === String(value));
       updatedItems[index].price = product ? product.price : 0;
+      updatedItems[index].quantity = updatedItems[index].quantity || 1;
+    } else if (field === "quantity") {
+      updatedItems[index].quantity = Number(value) || 1;
+    } else if (field === "price") {
+      updatedItems[index].price = Number(value) || 0;
     }
-
-    // Converte quantity e price para números seguros
-    updatedItems[index].quantity = Number(updatedItems[index].quantity) || 1;
-    updatedItems[index].price = Number(updatedItems[index].price) || 0;
 
     setFormData(prev => ({
       ...prev,
@@ -115,21 +105,15 @@ const OrderForm = ({ onSubmit }) => {
     }
   };
 
-  // Seleciona cliente da lista de sugestões
   const handleClientSelect = (client) => {
     setFormData(prev => ({ ...prev, clientId: client.id }));
     setClientSearch(client.name);
     setClientSuggestions([]);
   };
 
-  // Envia o pedido
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!formData.clientId) {
-      alert("Por favor, selecione um cliente válido.");
-      return;
-    }
+    if (!formData.clientId) return alert("Por favor, selecione um cliente válido.");
 
     const payload = {
       ...formData,
@@ -154,8 +138,7 @@ const OrderForm = ({ onSubmit }) => {
 
       if (response.ok) {
         alert("Pedido enviado com sucesso!");
-     onSubmit && onSubmit(payload);
-        // Reseta form após envio (opcional)
+        onSubmit && onSubmit(payload);
         setFormData({
           items: [{ id: "", quantity: 1, price: 0 }],
           totalOrder: 0,
@@ -178,7 +161,6 @@ const OrderForm = ({ onSubmit }) => {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Cliente - busca por nome */}
         <div className="relative">
           <label className="block text-sm font-medium">Cliente</label>
           <input
@@ -206,8 +188,6 @@ const OrderForm = ({ onSubmit }) => {
             </ul>
           )}
         </div>
-
-        {/* Número da mesa */}
         <div>
           <label className="block text-sm font-medium">Número da Mesa</label>
           <input
@@ -222,7 +202,6 @@ const OrderForm = ({ onSubmit }) => {
         </div>
       </div>
 
-      {/* Itens do pedido */}
       <div className="space-y-4">
         <div className="flex justify-between items-center">
           <h3 className="text-lg font-medium">Itens do Pedido</h3>
@@ -238,7 +217,6 @@ const OrderForm = ({ onSubmit }) => {
         {formData.items.map((item, index) => (
           <div key={index} className="p-4 border rounded-md space-y-3">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              {/* Produto */}
               <div>
                 <label className="block text-sm font-medium">Produto</label>
                 <select
@@ -250,40 +228,34 @@ const OrderForm = ({ onSubmit }) => {
                   <option value="">Selecione um produto</option>
                   {products.map(product => (
                     <option key={product.id} value={product.id}>
-                      {product.name} - R$ {product.price.toFixed(2)}
+                      {product.name} - R$ {Number(product.price).toFixed(2)}
                     </option>
                   ))}
                 </select>
               </div>
-
-              {/* Quantidade */}
               <div>
                 <label className="block text-sm font-medium">Quantidade</label>
                 <input
                   type="number"
                   value={item.quantity}
-                  onChange={(e) => handleItemChange(index, "quantity", parseInt(e.target.value, 10) || 1)}
+                  onChange={(e) => handleItemChange(index, "quantity", e.target.value)}
                   required
                   min="1"
                   className="w-full px-3 py-2 border rounded-md"
                 />
               </div>
-
-              {/* Preço editável */}
               <div>
                 <label className="block text-sm font-medium">Preço</label>
                 <input
                   type="number"
                   step="0.01"
                   value={item.price}
-                  onChange={(e) => handleItemChange(index, "price", parseFloat(e.target.value) || 0)}
+                  onChange={(e) => handleItemChange(index, "price", e.target.value)}
                   required
-                  className="w-full px-3 py-2 border rounded-md"
                   min="0"
+                  className="w-full px-3 py-2 border rounded-md"
                 />
               </div>
-
-              {/* Remover item */}
               <div className="flex items-end">
                 <button
                   type="button"
@@ -298,7 +270,6 @@ const OrderForm = ({ onSubmit }) => {
         ))}
       </div>
 
-      {/* Pagamento e outros */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
           <label className="block text-sm font-medium">Forma de Pagamento</label>
@@ -328,10 +299,16 @@ const OrderForm = ({ onSubmit }) => {
         </div>
         <div>
           <label className="block text-sm font-medium">Cupom de Desconto</label>
-          <input type="text" name="couponCode" value={formData.couponCode} onChange={handleChange} className="w-full px-3 py-2 border rounded-md" />
+          <input
+            type="text"
+            name="couponCode"
+            value={formData.couponCode}
+            onChange={handleChange}
+            className="w-full px-3 py-2 border rounded-md"
+          />
         </div>
       </div>
-      {/* Total e submit */}
+
       <div className="flex justify-between items-center pt-4">
         <div className="text-xl font-bold">
           Total: R$ {formData.totalOrder.toFixed(2)}
@@ -346,6 +323,5 @@ const OrderForm = ({ onSubmit }) => {
     </form>
   );
 };
+
 export default OrderForm;
-
-
