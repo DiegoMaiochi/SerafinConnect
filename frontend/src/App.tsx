@@ -5,14 +5,15 @@ import { AuthProvider } from "./contexts/AuthContext";
 import { useAuth } from "./hooks/useAuth";
 
 import LoginPage from "./pages/LoginPage";
-import Dashboard from "./NovasTelas/dashboard/DashboardT";  // certifique-se do caminho
-import { SideBar } from "./NovasTelas/SideBar"; // certifique-se do caminho correto
+import FuncionarioLoginPage from "./pages/FuncionarioLoginPage";
+import ClientePage from "./pages/ClientePage";
+
+import { SideBar } from "./NovasTelas/SideBar";
 
 function PrivateRoute({ children }) {
   const { isAuthenticated, isLoading } = useAuth();
 
   if (isLoading) return <div>Carregando...</div>;
-
   return isAuthenticated ? children : <Navigate to="/login" replace />;
 }
 
@@ -21,20 +22,23 @@ function App() {
     <AuthProvider>
       <Router>
         <Routes>
+          {/* Telas públicas */}
           <Route path="/login" element={<LoginPage />} />
-          
-          {/* Rotas privadas */}
-          
-<Route path="/dashboard" element={
-  <PrivateRoute>
-    <SideBar />
-  </PrivateRoute>
-} />
+          <Route path="/funcionario" element={<FuncionarioLoginPage />} />
+          <Route path="/cliente" element={<ClientePage />} />
 
-         
+          {/* Rotas protegidas */}
+          <Route
+            path="/dashboard"
+            element={
+              <PrivateRoute>
+                <SideBar />
+              </PrivateRoute>
+            }
+          />
 
-          {/* Redirecionamento padrão */}
-          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          {/* Rota padrão */}
+          <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
       </Router>
     </AuthProvider>

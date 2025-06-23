@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { FiFilter, FiSearch, FiXCircle } from "react-icons/fi";
 import { getAccessToken } from "../../utils/tokenStorage";
-import PedidoList from "./orderList/orderList"; // Supondo que você tenha um componente para listar pedidos
+import PedidoList from "./orderList/orderList";
 
 export function Pedidos() {
     const [showForm, setShowForm] = useState(false);

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate,useLocation } from 'react-router-dom';
 import LoginForm from '../components/LoginForm';
 import { RegisterForm } from '../components/auth/RegisterForm';
 import { useAuth } from '../hooks/useAuth';
@@ -9,22 +9,27 @@ const LoginPage = () => {
   const { isAuthenticated, tokenExpiresAt } = useAuth(); // Espera receber timestamp em ms
   const navigate = useNavigate();
   const [animationClass, setAnimationClass] = useState('');
-
+const location = useLocation();
+const isFuncionario = location.pathname === '/funcionario';
   useEffect(() => {
-    if (isAuthenticated) {
+  if (isAuthenticated) {
+    if (isFuncionario) {
       navigate('/dashboard');
+    } else {
+      navigate('/cliente');
+    }
 
-      if (tokenExpiresAt) {
-        const now = Date.now();
-        const msLeft = tokenExpiresAt - now;
-        if (msLeft > 0) {
-          const minutesLeft = Math.floor(msLeft / 60000);
-          const secondsLeft = Math.floor((msLeft % 60000) / 1000);
-          alert(`Seu token expira em ${minutesLeft} minuto(s) e ${secondsLeft} segundo(s).`);
-        }
+    if (tokenExpiresAt) {
+      const now = Date.now();
+      const msLeft = tokenExpiresAt - now;
+      if (msLeft > 0) {
+        const minutesLeft = Math.floor(msLeft / 60000);
+        const secondsLeft = Math.floor((msLeft % 60000) / 1000);
+        alert(`Seu token expira em ${minutesLeft} minuto(s) e ${secondsLeft} segundo(s).`);
       }
     }
-  }, [isAuthenticated, navigate, tokenExpiresAt]);
+  }
+}, [isAuthenticated, navigate, tokenExpiresAt, isFuncionario]);
 
   const switchView = (toLogin) => {
     setAnimationClass(toLogin ? 'slide-right' : 'slide-left');
@@ -51,8 +56,8 @@ const LoginPage = () => {
           </h2>
           <p className="text-white/80 mb-8 max-w-xs">
             {isLogin
-              ? 'Cadastre-se no Seraphine Connect, a solução inteligente de autoatendimento para bares e restaurantes.'
-              : 'Acesse sua conta no Seraphine Connect e continue oferecendo experiências incríveis aos seus clientes.'}
+              ? 'Cadastre-se no Serafin Connect, a solução inteligente de autoatendimento para bares e restaurantes.'
+              : 'Acesse sua conta no Serafin Connect e continue oferecendo experiências incríveis aos seus clientes.'}
           </p>
           <button
             onClick={() => switchView(!isLogin)}
@@ -60,6 +65,16 @@ const LoginPage = () => {
           >
             {isLogin ? 'Criar conta' : 'Entrar'}
           </button>
+<div className="mt-4 text-center">
+  <a
+    href="/funcionario"
+    className="text-sm text-gray-500 hover:text-rose-500 transition"
+  >
+    Sou funcionário
+  </a>
+</div>
+
+
         </div>
 
         {/* Formulário */}
@@ -70,8 +85,8 @@ const LoginPage = () => {
             </h1>
             <p className="text-gray-600 mb-8">
               {isLogin
-                ? 'Digite suas credenciais para entrar no Seraphine Connect'
-                : 'Preencha os dados para começar a usar o Seraphine Connect'}
+                ? 'Digite suas credenciais para entrar no Serafin Connect'
+                : 'Preencha os dados para começar a usar o Serafin Connect'}
             </p>
 
             {isLogin ? (
