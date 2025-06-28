@@ -3,7 +3,7 @@ const Price = require('../models/priceModel');
 const Stock = require('../models/stockModel');
 const sequelize = require('../config/sequelize');
 
-; // ← isso aqui é a instância correta
+
 const productController = {
     getAllProducts: async (req, res) => {
         try {
