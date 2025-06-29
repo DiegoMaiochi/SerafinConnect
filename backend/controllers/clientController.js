@@ -1,8 +1,43 @@
 const { Op } = require('sequelize');
 const bcrypt = require('bcrypt');
 const Client = require('../models/Client'); // Model Sequelize
+const Order = require('../models/orderModel');
+const ItensPedido = require('../models/itemPedido');
+const Product = require('../models/productModel');
 
 const clientController = {
+    getClientOrdersReport: async (req, res) => {
+    const clientId = req.params.id;
+
+    try {
+      const orders = await Order.findAll({
+        where: { clientId },
+        include: [
+          {
+            model: ItensPedido,
+            as: 'ItensPedido',
+            attributes: ['productId', 'quantity', 'price'],
+            include: [
+              {
+                model: Product,
+                as: 'product',
+                attributes: ['id', 'name']
+              }
+            ]
+          }
+        ]
+      });
+
+      if (!orders.length) {
+        return res.status(404).json({ message: 'Nenhum pedido encontrado para este cliente.' });
+      }
+
+      res.status(200).json(orders);
+    } catch (error) {
+      console.error('Erro ao obter relatório de pedidos do cliente:', error);
+      res.status(500).json({ error: 'Erro ao obter relatório de pedidos do cliente.' });
+    }
+  },
   getAllClients: async (req, res) => {
     const {
       page = 1,

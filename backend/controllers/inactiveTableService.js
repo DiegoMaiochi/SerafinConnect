@@ -1,5 +1,7 @@
 // controllers/inactiveTableController.js
-const { InactiveTable } = require('../models');
+const { InactiveTable,Order,sequelize } = require('../models');
+const { Op, fn, col } = require('sequelize');
+
 const inactiveTableService = {
   getAllTables: async () => {
     try {
@@ -25,7 +27,39 @@ const inactiveTableService = {
       throw error;
     }
   },
+getConsumptionReport: async (startDate, endDate) => {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
 
+    try {
+      const result = await Order.findAll({
+        attributes: [
+          'tableId',
+          [fn('COUNT', col('Order.id')), 'totalPedidos'],
+          [fn('SUM', col('Order.totalOrder')), 'totalConsumo'],
+        ],
+        include: [
+          {
+            model: InactiveTable,
+            as: 'table',
+            attributes: ['id', 'identifier'],
+            required: false,
+          },
+        ],
+        where: {
+          creationDate: {
+            [Op.between]: [start, end],
+          },
+        },
+        group: ['Order.tableId', 'table.id', 'table.identifier'],
+      });
+
+      return result;
+    } catch (error) {
+      console.error('Erro ao gerar relatório de consumo:', error);
+      throw error;
+    }
+  },
   updateInativeTable: async (status, id) => {
     try {
       const table = await InactiveTable.findByPk(id);

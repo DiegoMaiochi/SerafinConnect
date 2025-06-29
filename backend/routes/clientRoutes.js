@@ -143,5 +143,34 @@ router.post('/clientes', clientController.createNewClient);
  */
 router.put('/cliente/:id', clientController.updateClient);
 router.get('/clientes/search', clientController.searchClientsByName);
+/**
+ * @swagger
+ * /clientes/{id}/pedidos:
+ *   get:
+ *     summary: Relatório de pedidos de um cliente específico
+ *     tags: [Clientes]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: ID do cliente
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Lista de pedidos do cliente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Order'
+ *       404:
+ *         description: Nenhum pedido encontrado para o cliente
+ *       500:
+ *         description: Erro ao obter relatório
+ */
+
+router.get('/clientes/:id/pedidos', clientController.getClientOrdersReport);
 
 module.exports = router;

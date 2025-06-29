@@ -45,7 +45,24 @@ const inactiveTableController = {
       console.error(error);
       res.status(500).json({ error: 'Erro ao atualizar a mesa.' });
     }
+  },
+getConsumptionReport: async (req, res) => {
+    try {
+      const { startDate, endDate } = req.query;
+
+      if (!startDate || !endDate) {
+        return res.status(400).json({ error: 'Informe startDate e endDate no formato ISO' });
+      }
+
+      const report = await inactiveTableService.getConsumptionReport(startDate, endDate);
+
+      res.status(200).json(report);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Erro ao gerar relatório de consumo.' });
+    }
   }
+
 };
 
 module.exports = inactiveTableController;

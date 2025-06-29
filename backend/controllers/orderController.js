@@ -1,9 +1,9 @@
 const { Op } = require('sequelize');
 const orderModel = require('../models/orderModel');
 const DiscountCupom = require('../models/discountModel');
-const { Order, Client, ItensPedido } = require('../models'); // ✅ CERTO
+const { Order, Client, ItensPedido, LogPedido } = require('../models');
 const Product = require('../models/productModel');
-const sequelize = require('../config/sequelize')
+const sequelize = require('../config/sequelize');
 
 const orderController = {
     getAllOrders: async (req, res) => {
@@ -23,7 +23,7 @@ const orderController = {
                             {
                                 model: Product,
                                 as: 'product',
-                                attributes: ['id', 'name'] 
+                                attributes: ['id', 'name']
                             }
                         ]
                     }
@@ -35,9 +35,6 @@ const orderController = {
             res.status(500).json({ error: 'Erro ao obter lista de pedidos.' });
         }
     },
-
-
-
 
     getOrder: async (req, res) => {
         const id = req.params.id;
@@ -65,7 +62,6 @@ const orderController = {
         const transaction = await sequelize.transaction();
 
         try {
-            // Validação e aplicação do cupom
             if (couponCode) {
                 const coupon = await DiscountCupom.findOne({
                     where: {
@@ -89,7 +85,6 @@ const orderController = {
                 );
             }
 
-            // Criação do pedido
             const newOrder = await Order.create({
                 totalOrder: totalOrder - discount,
                 paymentType,
@@ -100,10 +95,7 @@ const orderController = {
                 couponId
             }, { transaction });
 
-            // Inserção dos itens
             for (const item of items) {
-                console.log("Item recebido do front:", item);
-
                 await ItensPedido.create({
                     orderId: newOrder.id,
                     productId: item.id,
@@ -125,8 +117,20 @@ const orderController = {
                 await product.update({ quantity: newStock }, { transaction });
             }
 
-
             await transaction.commit();
+
+            // Log da criação
+            await LogPedido.create({
+                pedido_id: newOrder.id,
+                acao: 'created',
+                usuario: 'sistema',
+                detalhes: {
+                    totalOrder,
+                    discount,
+                    paymentType,
+                    items
+                }
+            });
 
             res.status(201).json({
                 message: `Pedido criado com sucesso! ID = ${newOrder.id}`,
@@ -139,87 +143,130 @@ const orderController = {
         }
     },
 
-    updateOrder: async (req, res) => {
-        const { status, employeeId } = req.body; // employeeId deve vir no corpo da requisição
-        const id = req.params.id;
+  updateOrder: async (req, res) => {
+  const { status, employeeId } = req.body;
+  const id = req.params.id;
 
-        if (!employeeId) {
-            return res.status(400).json({ error: 'ID do funcionário é obrigatório para atualizar o pedido.' });
-        }
+  if (!employeeId) {
+                    employeeId = 1  }
 
-        try {
-            const order = await Order.findByPk(id);
-            if (!order) {
-                return res.status(404).json({ error: 'Pedido não encontrado.' });
-            }
+  try {
+    const order = await Order.findByPk(id);
+    if (!order) {
+      return res.status(404).json({ error: 'Pedido não encontrado.' });
+    }
 
-            order.status = status;
+    const oldStatus = order.status;
+    order.status = status;
 
-            // Atualiza o vínculo com o funcionário dependendo do status
-            if (status.toLowerCase() === 'cancelado' || status.toLowerCase() === 'cancelled') {
-                order.cancelledById = employeeId;
-                order.completedById = null; // limpa se estava preenchido
-            } else if (status.toLowerCase() === 'completo' || status.toLowerCase() === 'completed') {
-                order.completedById = employeeId;
-                order.cancelledById = null; // limpa se estava preenchido
-            } else {
-                // Se status for outro, limpa os dois campos (ou mantém, dependendo da regra de negócio)
-                order.cancelledById = null;
-                order.completedById = null;
-            }
+    const lowerStatus = status.toLowerCase();
 
-            await order.save();
+    if (['cancelado', 'cancelled'].includes(lowerStatus)) {
+      order.cancelledById = employeeId;
+      order.cancelledAt = new Date();
+      order.completedById = null;
+      order.completedAt = null;
+    } else if (['completo', 'completed', 'finalizado', 'finalized'].includes(lowerStatus)) {
+      order.completedById = employeeId;
+      order.completedAt = new Date();
+      order.cancelledById = null;
+      order.cancelledAt = null;
+    } else {
+      // Status intermediário ou outro qualquer
+      order.cancelledById = null;
+      order.cancelledAt = null;
+      order.completedById = null;
+      order.completedAt = null;
+    }
 
-            res.status(200).json(order);
-        } catch (error) {
-            console.error('Erro ao atualizar o pedido:', error);
-            res.status(500).json({ error: 'Erro ao atualizar o pedido com id ' + id });
-        }
-    },
+    await order.save();
+
+    // Log de alteração de status
+    await LogPedido.create({
+      pedido_id: order.id,
+      acao: 'status_changed',
+      usuario: `funcionario_${employeeId}`,
+      detalhes: {
+        de: oldStatus,
+        para: status
+      }
+    });
+
+    res.status(200).json(order);
+  } catch (error) {
+    console.error('Erro ao atualizar o pedido:', error);
+    res.status(500).json({ error: 'Erro ao atualizar o pedido com id ' + id });
+  }
+},
 
 
     getOrdersByPaymentType: async (req, res) => {
         try {
-            const report = await orderModel.findAll({
-                attributes: ['paymentType', [sequelize.fn('COUNT', sequelize.col('id')), 'total_orders']],
-                group: ['paymentType'],
-                order: [[sequelize.fn('COUNT', sequelize.col('id')), 'DESC']]
-            });
-
-            // Retorna o relatório de pedidos por tipo de pagamento
-            res.status(200).json(report);
-        } catch (error) {
-            res.status(500).json({ error: 'Erro ao gerar relatório de pedidos por tipo de pagamento.' });
-        }
-    },
-
-    getPaymentReportByDateRange: async (req, res) => {
-        const { startDate, endDate } = req.query;
-
-        // Verificar se as datas foram fornecidas
-        if (!startDate || !endDate) {
-            return res.status(400).json({ error: 'As datas de início e fim são obrigatórias.' });
-        }
-
-        try {
-            const report = await orderModel.findAll({
-                attributes: ['paymentType', [sequelize.fn('COUNT', sequelize.col('id')), 'total_orders']],
+            const report = await Order.findAll({
+                attributes: [
+                    'paymentType',
+                    [sequelize.fn('COUNT', sequelize.col('Order.id')), 'total_orders'],
+                    [sequelize.fn('SUM', sequelize.col('Order.totalOrder')), 'total_value'],
+                    [sequelize.fn('AVG', sequelize.col('Order.totalOrder')), 'avg_order_value'],
+                ],
                 where: {
                     creationDate: {
                         [Op.between]: [startDate, endDate]
                     }
                 },
-                group: ['paymentType']
+                include: [
+                    {
+                        model: LogPedido,
+                        as: 'logs',
+                        attributes: ['id', 'acao', 'usuario', 'detalhes', 'criado_em']
+                    }
+                ],
+                group: ['Order.paymentType', 'logs.id'] // Atenção aqui: o group precisa incluir campos não agregados da associação
             });
 
-            res.status(200).json({
-                message: 'Relatório de pedidos por tipo de pagamento',
-                paymentReport: report
-            });
+
+            res.status(200).json(report);
         } catch (error) {
+            console.error(error);
             res.status(500).json({ error: 'Erro ao gerar relatório de pedidos por tipo de pagamento.' });
         }
-    }
+    },
+
+    getPaymentReportByDateRange: async (req, res) => {
+  const { startDate, endDate } = req.query;
+
+  if (!startDate || !endDate) {
+    return res.status(400).json({ error: 'As datas de início e fim são obrigatórias.' });
+  }
+
+  try {
+    const report = await Order.findAll({
+      attributes: [
+        'paymentType',
+        [sequelize.fn('COUNT', sequelize.col('id')), 'total_orders'],
+        [sequelize.fn('SUM', sequelize.col('totalOrder')), 'total_value'],
+        [sequelize.fn('AVG', sequelize.col('totalOrder')), 'avg_order_value'],
+      ],
+      where: {
+        creationDate: {
+          [Op.between]: [new Date(startDate), new Date(endDate)],
+        },
+      },
+      group: ['paymentType'],
+      order: [['paymentType', 'ASC']],
+    });
+
+    res.status(200).json({
+      message: 'Relatório de pedidos por tipo de pagamento',
+      paymentReport: report,
+    });
+  } catch (error) {
+    console.error('Erro ao gerar relatório:', error);
+    res.status(500).json({ error: 'Erro ao gerar relatório de pedidos por tipo de pagamento.' });
+  }
+}
+
+
 };
 
 module.exports = orderController;

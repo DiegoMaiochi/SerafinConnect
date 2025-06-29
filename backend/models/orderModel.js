@@ -84,6 +84,7 @@ class Order extends Model {
   static associate(models) {
     this.belongsTo(models.DiscountCupom, { foreignKey: 'couponId', targetKey: 'id' });
     this.belongsTo(models.Client, { foreignKey: 'clientId', as: 'cliente' });
+  this.belongsTo(models.InactiveTable, { foreignKey: 'tableId', as: 'table' });
 
     this.belongsToMany(models.Product, {
       through: models.ItensPedido,
@@ -102,6 +103,11 @@ class Order extends Model {
     // Associações para funcionário que cancelou/completou
     this.belongsTo(models.Employee, { as: 'cancelledBy', foreignKey: 'cancelledById' });
     this.belongsTo(models.Employee, { as: 'completedBy', foreignKey: 'completedById' });
+    this.hasMany(models.LogPedido, {
+  foreignKey: 'pedido_id',
+  as: 'logs'
+});
+
   }
 }
 

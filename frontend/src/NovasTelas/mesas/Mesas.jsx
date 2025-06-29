@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { FiFilter, FiSearch } from "react-icons/fi";
 import { getAccessToken } from "../../utils/tokenStorage";
+import { RelatorioConsumoModal } from "./RelatorioConsumoModal"; // ajuste o caminho
 
 export function Mesas() {
   const token = getAccessToken();
+const [modalRelatorioAberto, setModalRelatorioAberto] = useState(false);
 
   const [mesas, setMesas] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -11,15 +13,19 @@ export function Mesas() {
   const [pagina, setPagina] = useState(1);
   const porPagina = 5;
 
-  // Modal para nova mesa
   const [modalAberto, setModalAberto] = useState(false);
   const [novoIdentifier, setNovoIdentifier] = useState("");
   const [salvando, setSalvando] = useState(false);
 
-  // Carregar mesas
   useEffect(() => {
     fetchMesas();
   }, []);
+
+  useEffect(() => {
+    if (pagina > totalPaginas && totalPaginas > 0) {
+      setPagina(1);
+    }
+  }, [mesas, busca, pagina]);
 
   async function fetchMesas() {
     setLoading(true);
@@ -37,7 +43,6 @@ export function Mesas() {
     }
   }
 
-  // Filtrar mesas pela busca
   const mesasFiltradas = mesas.filter(mesa =>
     mesa.identifier.toLowerCase().includes(busca.toLowerCase())
   );
@@ -45,7 +50,6 @@ export function Mesas() {
   const totalPaginas = Math.ceil(mesasFiltradas.length / porPagina);
   const mesasPaginadas = mesasFiltradas.slice((pagina - 1) * porPagina, pagina * porPagina);
 
-  // Criar nova mesa
   async function handleCriarMesa() {
     if (!novoIdentifier.trim()) {
       alert("Informe um identificador para a mesa.");
@@ -77,8 +81,8 @@ export function Mesas() {
     }
   }
 
-  // Toggle status ativo/inativo
   async function toggleStatus(mesa) {
+    if (mesa.status && !window.confirm("Tem certeza que deseja desativar esta mesa?")) return;
     try {
       const res = await fetch("http://localhost:3000/api/mesa", {
         method: "PUT",
@@ -106,7 +110,18 @@ export function Mesas() {
         <h3 className="font-bold">Crie e gerencie as mesas de seu estabelecimento.</h3>
         <hr className="border-y-2 w-full mt-2 border-gray-200" />
       </div>
+<button
+  onClick={() => setModalRelatorioAberto(true)}
+  className="bg-red-400 p-1 pl-4 pr-4 rounded-2xl font-bold ml-2 hover:bg-red-500 transition"
+>
+  📊 RELATÓRIO
+</button>
 
+
+<RelatorioConsumoModal
+  aberto={modalRelatorioAberto}
+  onClose={() => setModalRelatorioAberto(false)}
+/>
       <div className="flex mt-4 ml-10 items-center gap-2">
         <div className="bg-gray-200 w-4/5 p-1 rounded-2xl flex items-center">
           <FiSearch size={25} className="text-red-500 ml-2" />
@@ -172,7 +187,6 @@ export function Mesas() {
           </table>
         )}
 
-        {/* Paginação */}
         <div className="flex justify-center mt-6 gap-2">
           <button
             disabled={pagina === 1}
@@ -194,7 +208,6 @@ export function Mesas() {
         </div>
       </div>
 
-      {/* Modal Criar Mesa */}
       {modalAberto && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg w-96 shadow-lg relative">
@@ -212,6 +225,7 @@ export function Mesas() {
               className="border rounded w-full p-2 mb-4"
               value={novoIdentifier}
               onChange={(e) => setNovoIdentifier(e.target.value)}
+              disabled={salvando}
             />
 
             <div className="flex justify-end gap-2">

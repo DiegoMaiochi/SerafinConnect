@@ -15,26 +15,39 @@ const GenerateReportModal = ({ onClose }) => {
 
         const doc = new jsPDF();
 
-        // Título
         doc.setFontSize(18);
         doc.text("Relatório de Pedidos", 14, 22);
 
-        // Data de geração
         const now = new Date().toLocaleString();
         doc.setFontSize(10);
         doc.text(`Gerado em: ${now}`, 14, 30);
 
-        // Definindo colunas da tabela
-        const tableColumn = ["ID do Pedido", "Tipo de Pagamento", "Total do Pedido (R$)"];
+        let tableColumn = [];
+        let tableRows = [];
 
-        // Mapeia dados para linhas
-        const tableRows = reportData.map(item => [
-            item.id || "N/A",
-            item.paymentType || "N/A",
-            item.totalOrder ? item.totalOrder.toFixed(2) : "0.00"
-        ]);
+        // Verifica formato para montar tabela certa
+        if (reportData[0].id) {
+            // Relatório por cliente - lista de pedidos
+            tableColumn = ["ID do Pedido", "Tipo de Pagamento", "Total do Pedido (R$)"];
+            tableRows = reportData.map(item => [
+                item.id || "N/A",
+                item.paymentType || "N/A",
+                item.totalOrder ? item.totalOrder.toFixed(2) : "0.00"
+            ]);
+        } else if (reportData[0].paymentType && reportData[0].total_orders) {
+            // Relatório agregado por tipo de pagamento
+            tableColumn = ["Tipo de Pagamento", "Total de Pedidos", "Valor Total (R$)", "Valor Médio (R$)"];
+            tableRows = reportData.map(item => [
+                item.paymentType || "N/A",
+                item.total_orders || "0",
+                item.total_value ? Number(item.total_value).toFixed(2) : "0.00",
+                item.avg_order_value ? Number(item.avg_order_value).toFixed(2) : "0.00",
+            ]);
+        } else {
+            alert("Formato de dados desconhecido para gerar relatório.");
+            return;
+        }
 
-        // Gera a tabela no PDF
         autoTable(doc, {
             head: [tableColumn],
             body: tableRows,
@@ -43,23 +56,30 @@ const GenerateReportModal = ({ onClose }) => {
             headStyles: { fillColor: [255, 99, 71] }
         });
 
-        // Salva PDF
         doc.save("relatorio_pedidos.pdf");
     };
 
+
     const handleGenerate = async () => {
+        let test;
         try {
             let url = "";
 
             if (filterType === "date") {
                 url = `http://localhost:3000/api/relatorios/pagamento?startDate=${startDate}&endDate=${endDate}`;
+
             } else {
                 url = `http://localhost:3000/api/pedidos?cliente=${clientName}`;
             }
 
             const res = await fetch(url);
             const data = await res.json();
-            generatePDF(data);
+            test = data
+            if (filterType == "date") {
+                test = data.paymentReport
+            }
+
+            generatePDF(test);
 
 
             onClose();

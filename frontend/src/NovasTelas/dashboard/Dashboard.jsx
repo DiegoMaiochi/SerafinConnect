@@ -3,178 +3,228 @@ import { Search, Filter, List, PlusCircle, X, FileText } from "lucide-react";
 import OrderForm from "./OrderForm";
 import PedidoList from "./orderList/orderList";
 import EditPedidoModal from "./orderList/editOrderModal";
-import RelatorioModal from "./RelatorioModal";
 import GenerateReportModal from "./reports/GenerateReportModal";
 
-
-
 export function Dashboard() {
-    const [isRelatorioModalOpen, setIsRelatorioModalOpen] = useState(false);
-    const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+  const [isRelatorioModalOpen, setIsRelatorioModalOpen] = useState(false);
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [pedidoList, setPedidoList] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [pedidoSelecionado, setPedidoSelecionado] = useState(null);
+  const [statusFilter, setStatusFilter] = useState(null); // <-- filtro status ativo
+  const [showFilterDropdown, setShowFilterDropdown] = useState(false); // controla dropdown filtro
 
-    const handleOpenRelatorioModal = () => setIsRelatorioModalOpen(true);
-    const handleCloseRelatorioModal = () => setIsRelatorioModalOpen(false);
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [editModalOpen, setEditModalOpen] = useState(false);
-    const [pedidoList, setPedidoList] = useState([]);
-    const [searchTerm, setSearchTerm] = useState("");
-    const [pedidoSelecionado, setPedidoSelecionado] = useState(null);
+  const handleOpenModal = () => setIsModalOpen(true);
+  const handleCloseModal = () => setIsModalOpen(false);
 
-    const handleOpenModal = () => setIsModalOpen(true);
-    const handleCloseModal = () => setIsModalOpen(false);
-    const handleOpenEditModal = (pedido) => {
-        setPedidoSelecionado(pedido);
-        setEditModalOpen(true);
-    };
-    const handleCloseEditModal = () => {
-        setPedidoSelecionado(null);
-        setEditModalOpen(false);
-    };
+  const handleOpenEditModal = (pedido) => {
+    setPedidoSelecionado(pedido);
+    setEditModalOpen(true);
+  };
+  const handleCloseEditModal = () => {
+    setPedidoSelecionado(null);
+    setEditModalOpen(false);
+  };
 
-    const fetchPedidos = async () => {
-        try {
-            const response = await fetch("http://localhost:3000/api/pedidos");
-            if (response.ok) {
-                const data = await response.json();
-                setPedidoList(data);
-            } else {
-                console.error("Erro ao buscar pedidos.");
-            }
-        } catch (error) {
-            console.error("Erro na requisição:", error);
-        }
-    };
+  const fetchPedidos = async () => {
+    try {
+      const response = await fetch("http://localhost:3000/api/pedidos");
+      if (response.ok) {
+        const data = await response.json();
+        setPedidoList(data);
+      } else {
+        console.error("Erro ao buscar pedidos.");
+      }
+    } catch (error) {
+      console.error("Erro na requisição:", error);
+    }
+  };
 
-    useEffect(() => {
+  useEffect(() => {
+    fetchPedidos();
+  }, []);
+
+  const handleOrderSubmit = () => {
+    handleCloseModal();
+    fetchPedidos();
+  };
+
+  const handlePedidoUpdate = async (pedidoAtualizado) => {
+    try {
+      const response = await fetch(`http://localhost:3000/api/pedido/${pedidoAtualizado.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(pedidoAtualizado),
+      });
+
+      if (response.ok) {
+        alert("Pedido atualizado com sucesso!");
+        handleCloseEditModal();
         fetchPedidos();
-    }, []);
+      } else {
+        alert("Erro ao atualizar o pedido.");
+      }
+    } catch (error) {
+      console.error("Erro ao atualizar pedido:", error);
+      alert("Erro ao atualizar o pedido.");
+    }
+  };
 
-    const handleOrderSubmit = () => {
-        handleCloseModal();     // Fecha o modal
-        fetchPedidos();         // Atualiza a lista de pedidos
-    };
+  // Filtra os pedidos pelo termo de busca e pelo status
+  const pedidosFiltrados = pedidoList.filter((pedido) => {
+    const matchesSearch = pedido.cliente?.name?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus = statusFilter ? pedido.status === statusFilter : true;
+    return matchesSearch && matchesStatus;
+  });
 
-    const handlePedidoUpdate = async (pedidoAtualizado) => {
-        try {
-            const response = await fetch(`http://localhost:3000/api/pedido/${pedidoAtualizado.id}`, {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(pedidoAtualizado),
-            });
+  const totalFinalizados = pedidoList.filter(p => p.status === "finalizado").length;
+  const totalPendentes = pedidoList.filter(p => p.status === "pendente").length;
 
-            if (response.ok) {
-                alert("Pedido atualizado com sucesso!");
-                handleCloseEditModal();
-                fetchPedidos();
-            } else {
-                alert("Erro ao atualizar o pedido.");
-            }
-        } catch (error) {
-            console.error("Erro ao atualizar pedido:", error);
-            alert("Erro ao atualizar o pedido.");
-        }
-    };
+  return (
+    <div className="m-7">
+      <div>
+        <h1 className="text-red-500 font-black text-5xl mt-4">DASHBOARD</h1>
+        <h3 className="font-bold">Olá, Seja Bem-Vindo!</h3>
+        <hr className="border-y-2 w-full mt-2 border-gray-200" />
+      </div>
 
-    const pedidosFiltrados = pedidoList.filter((pedido) =>
-        pedido.cliente?.name?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-
-    const totalFinalizados = pedidoList.filter(p => p.status === "finalizado").length;
-    const totalPendentes = pedidoList.filter(p => p.status === "pendente").length;
-
-    return (
-        <div className="m-7">
-            <div>
-                <h1 className="text-red-500 font-black text-5xl mt-4">DASHBOARD</h1>
-                <h3 className="font-bold">Olá, Seja Bem-Vindo!</h3>
-                <hr className="border-y-2 w-full mt-2 border-gray-200" />
-            </div>
-
-            <div className="flex flex-wrap mt-4 ml-2 md:ml-10 gap-2">
-                <div>
-                    <button
-                        onClick={() => setIsReportModalOpen(true)}
-                        className="bg-red-400 p-2 pl-4 pr-4 rounded-2xl font-bold ml-2 flex items-center hover:bg-red-500 transition-colors"
-                    >
-                        <FileText size={20} className="mr-2" /> Gerar Relatório
-                    </button>
-                </div>
-                <div className="bg-gray-200 w-full sm:w-4/5 p-1 rounded-2xl flex items-center">
-                    <Search size={25} className="text-red-500 ml-2" />
-                    <input
-                        type="text"
-                        placeholder="Pesquisar por cliente..."
-                        className="bg-transparent w-full ml-2 outline-none"
-                        value={searchTerm}
-                        onChange={e => setSearchTerm(e.target.value)}
-                    />
-                </div>
-
-
-                {isReportModalOpen && (
-                    <GenerateReportModal onClose={() => setIsReportModalOpen(false)} />
-                )}
-
-
-
-
-                <div className="flex gap-2 ml-2">
-                    <Filter size={25} className="text-red-500 cursor-pointer" />
-                    <List size={25} className="text-red-500 cursor-pointer" />
-                    <button
-                        onClick={handleOpenModal}
-                        className="bg-green-400 p-2 pl-4 pr-4 rounded-2xl font-bold ml-2 flex items-center hover:bg-green-500 transition-colors"
-                    >
-                        <PlusCircle size={20} className="mr-2" /> Adicionar Pedido
-                    </button>
-
-
-                </div>
-            </div>
-
-            <div className="bg-gray-200 h-auto mt-4 p-8 rounded-2xl flex flex-col md:flex-row justify-evenly gap-4 relative">
-                <div className="bg-gray-400 h-16 p-4 pl-7 pr-7 rounded-3xl font-bold text-lg flex items-center justify-center">
-                    <h1>FINALIZADOS: {totalFinalizados}</h1>
-                </div>
-
-                <div className="hidden md:block border-l-2 border-gray-600"></div>
-
-                <div className="bg-gray-400 h-16 p-4 pl-7 pr-7 rounded-3xl font-bold text-lg flex items-center justify-center">
-                    <h1>PENDENTES: {totalPendentes}</h1>
-                </div>
-            </div>
-
-            <PedidoList pedidos={pedidosFiltrados} onEditPedido={handleOpenEditModal} />
-
-            {isModalOpen && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                    <div className="bg-white p-6 md:p-8 rounded-lg shadow-2xl w-full max-w-4xl relative animate-fade-in">
-                        <div className="flex justify-between items-center mb-4">
-                            <h2 className="text-2xl font-bold text-red-500">Novo Pedido</h2>
-                            <button
-                                onClick={handleCloseModal}
-                                className="text-gray-600 hover:text-black transition p-1 rounded-full hover:bg-gray-100"
-                            >
-                                <X size={24} />
-                            </button>
-                        </div>
-                        <OrderForm onSubmit={handleOrderSubmit} />
-                    </div>
-                </div>
-            )}
-
-            {editModalOpen && pedidoSelecionado && (
-
-                <EditPedidoModal
-
-                    pedido={pedidoSelecionado}
-                    onClose={handleCloseEditModal}
-                    onUpdate={handlePedidoUpdate}
-                    employeeId={1}
-                />
-            )}
+      <div className="flex flex-wrap mt-4 ml-2 md:ml-10 gap-2">
+        <div>
+          <button
+            onClick={() => setIsReportModalOpen(true)}
+            className="bg-red-400 p-2 pl-4 pr-4 rounded-2xl font-bold ml-2 flex items-center hover:bg-red-500 transition-colors"
+          >
+            <FileText size={20} className="mr-2" /> Gerar Relatório
+          </button>
         </div>
-    );
+
+        <div className="bg-gray-200 w-full sm:w-4/5 p-1 rounded-2xl flex items-center">
+          <Search size={25} className="text-red-500 ml-2" />
+          <input
+            type="text"
+            placeholder="Pesquisar por cliente..."
+            className="bg-transparent w-full ml-2 outline-none"
+            value={searchTerm}
+            onChange={e => setSearchTerm(e.target.value)}
+          />
+        </div>
+
+        {isReportModalOpen && (
+          <GenerateReportModal onClose={() => setIsReportModalOpen(false)} />
+        )}
+
+        <div className="flex gap-2 ml-2 relative">
+          {/* Ícone de filtro que abre o dropdown */}
+          <Filter
+            size={25}
+            className="text-red-500 cursor-pointer"
+            onClick={() => setShowFilterDropdown(!showFilterDropdown)}
+            title="Filtrar por status"
+          />
+
+          {/* Dropdown de filtro */}
+          {showFilterDropdown && (
+            <div className="absolute top-8 left-0 bg-white border rounded shadow-md p-2 z-50 w-40">
+              <div
+                className={`cursor-pointer px-2 py-1 rounded ${
+                  statusFilter === null ? "bg-red-200" : "hover:bg-gray-200"
+                }`}
+                onClick={() => {
+                  setStatusFilter(null);
+                  setShowFilterDropdown(false);
+                }}
+              >
+                Todos
+              </div>
+              <div
+                className={`cursor-pointer px-2 py-1 rounded ${
+                  statusFilter === "pendente" ? "bg-red-200" : "hover:bg-gray-200"
+                }`}
+                onClick={() => {
+                  setStatusFilter("pendente");
+                  setShowFilterDropdown(false);
+                }}
+              >
+                Pendentes
+              </div>
+              <div
+                className={`cursor-pointer px-2 py-1 rounded ${
+                  statusFilter === "finalizado" ? "bg-red-200" : "hover:bg-gray-200"
+                }`}
+                onClick={() => {
+                  setStatusFilter("finalizado");
+                  setShowFilterDropdown(false);
+                }}
+              >
+                Finalizados
+              </div>
+              <div
+                className={`cursor-pointer px-2 py-1 rounded ${
+                  statusFilter === "cancelado" ? "bg-red-200" : "hover:bg-gray-200"
+                }`}
+                onClick={() => {
+                  setStatusFilter("cancelado");
+                  setShowFilterDropdown(false);
+                }}
+              >
+                Cancelados
+              </div>
+            </div>
+          )}
+
+          <List size={25} className="text-red-500 cursor-pointer" />
+          <button
+            onClick={handleOpenModal}
+            className="bg-green-400 p-2 pl-4 pr-4 rounded-2xl font-bold ml-2 flex items-center hover:bg-green-500 transition-colors"
+          >
+            <PlusCircle size={20} className="mr-2" /> Adicionar Pedido
+          </button>
+        </div>
+      </div>
+
+      <div className="bg-gray-200 h-auto mt-4 p-8 rounded-2xl flex flex-col md:flex-row justify-evenly gap-4 relative">
+        <div className="bg-gray-400 h-16 p-4 pl-7 pr-7 rounded-3xl font-bold text-lg flex items-center justify-center">
+          <h1>FINALIZADOS: {totalFinalizados}</h1>
+        </div>
+
+        <div className="hidden md:block border-l-2 border-gray-600"></div>
+
+        <div className="bg-gray-400 h-16 p-4 pl-7 pr-7 rounded-3xl font-bold text-lg flex items-center justify-center">
+          <h1>PENDENTES: {totalPendentes}</h1>
+        </div>
+      </div>
+
+      <PedidoList pedidos={pedidosFiltrados} onEditPedido={handleOpenEditModal} />
+
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white p-6 md:p-8 rounded-lg shadow-2xl w-full max-w-4xl relative animate-fade-in">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-2xl font-bold text-red-500">Novo Pedido</h2>
+              <button
+                onClick={handleCloseModal}
+                className="text-gray-600 hover:text-black transition p-1 rounded-full hover:bg-gray-100"
+              >
+                <X size={24} />
+              </button>
+            </div>
+            <OrderForm onSubmit={handleOrderSubmit} />
+          </div>
+        </div>
+      )}
+
+      {editModalOpen && pedidoSelecionado && (
+        <EditPedidoModal
+          pedido={pedidoSelecionado}
+          onClose={handleCloseEditModal}
+          onUpdate={handlePedidoUpdate}
+          employeeId={1}
+        />
+      )}
+    </div>
+  );
 }
 
 export default Dashboard;

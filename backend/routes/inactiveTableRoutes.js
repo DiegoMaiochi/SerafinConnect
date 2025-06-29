@@ -113,5 +113,6 @@ router.post('/mesa', inactiveTableController.createNewInactiveTable);
 
 // router.put('/mesa', inactiveTableController.updateInactiveTable); // Descomente se necessário
 router.put('/mesa', inactiveTableController.updateInactiveTable);
+router.get('/inactiveTables/consumptionReport', inactiveTableController.getConsumptionReport);
 
 module.exports = router;

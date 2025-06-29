@@ -2,12 +2,14 @@ import { useState, useEffect } from "react";
 import { FiSearch, FiFilter, FiXCircle } from "react-icons/fi";
 import { getAccessToken } from "../../utils/tokenStorage";
 import EmployeeList from "./EmployeeList"; // você precisa criar esse componente como o ProductList
+import FuncionarioRelatorioModal from "./FuncionarioRelatorioModal"; // ajuste o caminho se necessário
 
 export function Funcionarios() {
     const [searchTerm, setSearchTerm] = useState("");
     const [employeeList, setEmployeeList] = useState([]);
     const [showForm, setShowForm] = useState(false);
     const token = getAccessToken();
+    const [showRelatorioModal, setShowRelatorioModal] = useState(false);
 
     const [name, setName] = useState("");
     const [document, setDocument] = useState("");
@@ -111,10 +113,19 @@ export function Funcionarios() {
                 >
                     +ADICIONAR
                 </button>
+                <button
+                    className="bg-blue-500 text-white font-bold p-1 pl-4 pr-4 rounded-2xl transition hover:bg-blue-600"
+                    onClick={() => setShowRelatorioModal(true)}
+                >
+                    RELATÓRIO
+                </button>
+
             </div>
 
             <EmployeeList employees={filteredEmployees} />
-
+        {showRelatorioModal && (
+  <FuncionarioRelatorioModal onClose={() => setShowRelatorioModal(false)} />
+)}
             {showForm && (
                 <div className="fixed bottom-0 right-0 h-full w-1/4 bg-gray-300 shadow-2xl p-6 rounded-tl-2xl rounded-bl-2xl border-t flex flex-col">
                     <button

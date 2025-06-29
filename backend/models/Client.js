@@ -43,7 +43,9 @@ class Client extends Model {
   }
 
   static associate(models) {
-    // Defina associações aqui, se houver
+    Client.hasMany(models.Order, { foreignKey: 'clientId', as: 'orders' });
+
+
   }
 }
 

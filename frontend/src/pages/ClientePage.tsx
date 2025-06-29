@@ -107,10 +107,13 @@ export default function ClientePage() {
   };
 
   const handleLogout = () => {
-    removeTokens();
-    localStorage.removeItem("userEmail");
-    navigate("/login");
-  };
+  removeTokens();
+  localStorage.removeItem("userEmail");
+  setTimeout(() => {
+navigate("/login", { replace: true, state: { fromLogout: true } });
+  }, 1);
+};
+
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });

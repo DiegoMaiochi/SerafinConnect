@@ -25,7 +25,14 @@ function App() {
           {/* Telas públicas */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/funcionario" element={<FuncionarioLoginPage />} />
-          <Route path="/cliente" element={<ClientePage />} />
+<Route
+  path="/cliente"
+  element={
+    <PrivateRoute>
+      <ClientePage />
+    </PrivateRoute>
+  }
+/>
 
           {/* Rotas protegidas */}
           <Route

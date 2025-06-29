@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { FiFilter, FiSearch, FiXCircle } from "react-icons/fi";
 import ProductList from "./ProductList";
 import { getAccessToken } from "../../utils/tokenStorage";
+import { RelatorioProdutos } from "./RelatorioProdutos";
 
 export function Produtos() {
     const [showForm, setShowForm] = useState(false);
@@ -9,7 +10,7 @@ export function Produtos() {
     const [selectedGroup, setSelectedGroup] = useState("");
     const [showTypeOptions, setShowTypeOptions] = useState(false);
     const [selectedType, setSelectedType] = useState("");
-
+  const [relatorioOpen, setRelatorioOpen] = useState(false);
     // Novos estados para filtro geral
     const [searchTerm, setSearchTerm] = useState("");
     const [showFilterOptions, setShowFilterOptions] = useState(false);
@@ -159,7 +160,18 @@ export function Produtos() {
                 <h1 className="text-red-500 font-black text-5xl ">PRODUTOS</h1>
                 <h3 className="font-bold">Crie e gerencie os dados de seus produtos.</h3>
                 <hr className="border-y-2 w-full mt-2 border-gray-200" />
+<button
+        className="bg-red-600 text-white rounded px-4 py-2 mt-4 ml-10 hover:bg-red-700"
+        onClick={() => setRelatorioOpen(true)}
+      >
+        Abrir Relatório de Produtos
+      </button>
 
+      <RelatorioProdutos
+        produtos={filteredProducts}
+        isOpen={relatorioOpen}
+        onClose={() => setRelatorioOpen(false)}
+      />
                 <div className="flex mt-4 ml-10 items-center space-x-3">
                     {/* Busca */}
                     <div className="bg-gray-200 w-4/5 p-1 rounded-2xl flex items-center">
@@ -371,6 +383,7 @@ export function Produtos() {
                     </button>
                 </div>
             )}
+            
         </div>
     );
 }

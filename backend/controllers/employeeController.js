@@ -1,9 +1,47 @@
-const { Op } = require('sequelize');
+const { Op,fn, col } = require('sequelize');
 const bcrypt = require('bcrypt');
-const { Employee } = require('../models');
+const { Employee, Order,sequelize  } = require('../models');
 
 const employeeController = {
-    // No employeeController (exemplo simples)
+   getOrdersByEmployeeReport: async (req, res) => {
+  try {
+    const { startDate, endDate } = req.query;
+
+    if (!startDate || !endDate) {
+      return res.status(400).json({ error: "Parâmetros startDate e endDate são obrigatórios." });
+    }
+
+    const report = await Order.findAll({
+      where: {
+        completedAt: {
+          [Op.between]: [new Date(startDate), new Date(endDate)]
+        },
+        completedById: {
+          [Op.ne]: null
+        }
+      },
+      attributes: [
+        'completedById',
+        [fn('COUNT', col('Order.id')), 'totalPedidos'],   // aqui corrigido
+        [fn('SUM', col('totalOrder')), 'totalFaturado']
+      ],
+      include: [
+        {
+          model: Employee,
+          as: 'completedBy', // ajuste conforme sua associação
+          attributes: ['id', 'name']
+        }
+      ],
+      group: ['completedById', 'completedBy.id', 'completedBy.name'],
+      order: [['completedById', 'ASC']]
+    });
+
+    res.status(200).json(report);
+  } catch (error) {
+    console.error('Erro ao gerar relatório de pedidos por funcionário:', error);
+    res.status(500).json({ error: 'Erro ao gerar relatório de pedidos por funcionário.' });
+  }
+},
 getPerformanceReport: async (req, res) => {
   try {
     const report = await Order.findAll({

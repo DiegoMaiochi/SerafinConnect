@@ -154,5 +154,6 @@ router.put('/funcionario/:id', authToken, employeeController.updateEmployee);
  *         description: Funcionário não encontrado
  */
 router.delete('/funcionario/:id', authToken, employeeController.deleteEmployee);
+router.get('/orders-employee/relatorio', employeeController.getOrdersByEmployeeReport);
 
 module.exports = router;

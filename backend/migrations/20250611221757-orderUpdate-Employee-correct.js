@@ -2,26 +2,26 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.addColumn('orders', 'cancelledAt', {
-      type: Sequelize.DATE,
-      allowNull: true,
-    });
+    // await queryInterface.addColumn('orders', 'cancelledAt', {
+    //   type: Sequelize.DATE,
+    //   allowNull: true,
+    // });
 
-    await queryInterface.addColumn('orders', 'completedAt', {
-      type: Sequelize.DATE,
-      allowNull: true,
-    });
+    // await queryInterface.addColumn('orders', 'completedAt', {
+    //   type: Sequelize.DATE,
+    //   allowNull: true,
+    // });
 
-    await queryInterface.addColumn('orders', 'cancelledById', {
-      type: Sequelize.INTEGER,
-      allowNull: true,
-      references: {
-        model: 'employee',
-        key: 'id'
-      },
-      onUpdate: 'CASCADE',
-      onDelete: 'SET NULL'
-    });
+    // await queryInterface.addColumn('orders', 'cancelledById', {
+    //   type: Sequelize.INTEGER,
+    //   allowNull: true,
+    //   references: {
+    //     model: 'employee',
+    //     key: 'id'
+    //   },
+    //   onUpdate: 'CASCADE',
+    //   onDelete: 'SET NULL'
+    // });
 
    await queryInterface.sequelize.query(`
   DO $$
