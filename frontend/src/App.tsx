@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-d
 
 import { AuthProvider } from "./contexts/AuthContext";
 import { useAuth } from "./hooks/useAuth";
+import { ProtectedRoute } from './components/ProtectedRoute';
 
 import LoginPage from "./pages/LoginPage";
 import FuncionarioLoginPage from "./pages/FuncionarioLoginPage";
