@@ -27,7 +27,7 @@ export function Funcionarios() {
             });
             if (response.ok) {
                 const data = await response.json();
-                setEmployeeList(data.data); // pois o backend retorna { data: [...], total: ... }
+                setEmployeeList(data.data); // backend retorna { data: [...], total: ... }
             } else {
                 console.error("Erro ao buscar funcionários.");
             }
@@ -94,7 +94,6 @@ export function Funcionarios() {
             <hr className="border-y-2 w-full mt-2 border-gray-200" />
 
             <div className="flex mt-4 ml-10 items-center space-x-3">
-                {/* Busca */}
                 <div className="bg-gray-200 w-4/5 p-1 rounded-2xl flex items-center">
                     <FiSearch size={25} className="text-red-500 ml-2" />
                     <input
@@ -106,7 +105,6 @@ export function Funcionarios() {
                     />
                 </div>
 
-                {/* Botão Adicionar */}
                 <button
                     className="bg-green-400 p-1 pl-4 pr-4 rounded-2xl font-bold ml-2 transition hover:bg-green-500"
                     onClick={toggleForm}
@@ -119,13 +117,35 @@ export function Funcionarios() {
                 >
                     RELATÓRIO
                 </button>
-
             </div>
 
-            <EmployeeList employees={filteredEmployees} />
-        {showRelatorioModal && (
-  <FuncionarioRelatorioModal onClose={() => setShowRelatorioModal(false)} />
-)}
+            <EmployeeList
+  employees={filteredEmployees}
+  onUpdateEmployee={(updatedEmployee) => {
+    // Atualiza o estado com os dados editados
+    setEmployeeList((prev) =>
+      prev.map((emp) =>
+        emp.id === updatedEmployee.id ? updatedEmployee : emp
+      )
+    );
+
+    // Exibe alerta de sucesso
+    import('sweetalert2').then((Swal) =>
+      Swal.default.fire({
+        icon: 'success',
+        title: 'Funcionário atualizado com sucesso!',
+        showConfirmButton: false,
+        timer: 1500,
+      })
+    );
+  }}
+/>
+
+
+            {showRelatorioModal && (
+                <FuncionarioRelatorioModal onClose={() => setShowRelatorioModal(false)} />
+            )}
+
             {showForm && (
                 <div className="fixed bottom-0 right-0 h-full w-1/4 bg-gray-300 shadow-2xl p-6 rounded-tl-2xl rounded-bl-2xl border-t flex flex-col">
                     <button
