@@ -152,7 +152,7 @@ export function Usuarios() {
                     <input
                         type="text"
                         placeholder="Buscar por nome..."
-                        className="pl-8 pr-4 py-2 border rounded-2xl"
+                        className="pl-8 pr-4 py-2"
                         value={busca}
                         onChange={(e) => setBusca(e.target.value)}
                     />
